@@ -1,0 +1,35 @@
+{
+    "main": "src/index.js",
+    "name": "next-compute-js",
+    "private": true,
+    "license": "MIT",
+    "scripts": {
+        "build": "js-compute-runtime bin/index.js bin/main.wasm",
+        "deploy": "npm run build && fastly compute deploy",
+        "prebuild": "npx @fastly/compute-js-static-publish --build-static && webpack"
+    },
+    "dependencies": {
+        "@fastly/js-compute": "^0.3.0",
+        "util": "^0.12.4"
+    },
+    "devDependencies": {
+        "@fastly/compute-js-static-publish": "^2.0.0-alpha.2",
+        "@fastly/next-compute-js": "^0.1.1-alpha.5",
+        "assert": "^2.0.0",
+        "browserify-zlib": "^0.2.0",
+        "buffer": "^6.0.3",
+        "core-js": "^3.19.1",
+        "crypto-browserify": "^3.12.0",
+        "os-browserify": "^0.3.0",
+        "path-browserify": "^1.0.1",
+        "process": "^0.11.10",
+        "querystring-es3": "^0.2.1",
+        "stream-browserify": "^3.0.0",
+        "url": "^0.11.0",
+        "webpack": "^5.64.0",
+        "webpack-cli": "^4.9.1"
+    },
+    "engines": {
+        "node": "^16"
+    }
+}

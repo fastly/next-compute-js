@@ -1,0 +1,12 @@
+# This file describes a Fastly Compute@Edge package. To learn more visit:
+# https://developer.fastly.com/reference/fastly-toml/
+
+authors = []
+description = "NextJs Server"
+language = "javascript"
+manifest_version = 2
+name = "next-compute-js"
+service_id = ""
+
+[local_server]
+[local_server.backends]
