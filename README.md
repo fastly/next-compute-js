@@ -84,6 +84,53 @@ your project name, the author name, and the service ID.
 Additionally, if the Server-Side parts of your application need any access to backends
 while running on the local development server, define them here.
 
+## Supported Next.js Features
+
+The following Next.js features are supported:
+
+* Static File Routing
+* Static Routed Pages - index routes, nested routes
+* Dynamic Routed Pages - dynamic route segments, catch-all, optional catch-all
+* Link object
+* Router object / Imperative Routing / Shallow Routing
+* Static Generation without Data
+* Client-Side fetching
+* SWR
+* Built-in CSS / CSS Modules
+* Layouts
+* Font Optimization
+* Headers
+* MDX
+* Custom App
+* Custom Document
+* Custom Error Page
+
+The following features are not yet supported, but are on the radar:
+
+* Rewrites
+* Redirects
+* Internationalized Routing
+* Server-Side Generation with Static Props / Static Paths
+* Server-Side Rendering with Server-Side Props
+* API Routes / API Middleware
+* Image Optimization
+* Preview Mode
+* React 18 support
+
+The following features are not supported at the current time:
+
+* Edge API Routes / Middleware
+* Incremental Static Regeneration
+* Dynamic Import
+
+## Known issues
+
+At the current time, React 18 is not supported. This is due to an incompatibility between
+the Compute@Edge Runtime and Next.js's new streaming renderer. This is expected to be corrected
+in an upcoming version of the Compute@Edge Runtime.
+
+For now, please use React 17.
+
 ## Issues
 
 If you encounter any non-security-related bug or unexpected behavior, please [file an issue][bug]
