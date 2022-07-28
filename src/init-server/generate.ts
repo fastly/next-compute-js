@@ -12,9 +12,17 @@ export function checkServerProject() {
   return fs.existsSync(computeJsDir);
 }
 
-export function copyResourceFile(filePath: string, src: string, target: string) {
+type CopyOptions = {
+  toFileName?: string,
+};
+
+export function copyResourceFile(filePath: string, src: string, target: string, opts?: CopyOptions) {
   const srcFilePath = path.resolve(__dirname, RESOURCES_DIR, src, filePath);
-  const targetFilePath = path.resolve(target, filePath);
+  let targetFilePath = path.resolve(target, filePath);
+  if(opts?.toFileName != null) {
+    targetFilePath = path.join(path.dirname(targetFilePath), opts.toFileName);
+  }
+  console.log(srcFilePath + ' -> ' + targetFilePath);
   fs.copyFileSync(srcFilePath, targetFilePath);
 }
 
@@ -34,7 +42,7 @@ export function generateServerProject() {
   const files = [
     'src/index.js',
     'src/polyfill.js',
-    '.gitignore',
+    ['_gitignore', '.gitignore'],
     '.node-version',
     'default-content-types.cjs',
     'fastly.toml',
@@ -43,6 +51,13 @@ export function generateServerProject() {
     'webpack.config.js',
   ];
   for (const file of files) {
-    copyResourceFile(file, 'compute-js', computeJsDir);
+    let fromFile: string;
+    let copyOpts: CopyOptions = {};
+    if(Array.isArray(file)) {
+      [fromFile, copyOpts.toFileName] = file;
+    } else {
+      fromFile = file;
+    }
+    copyResourceFile(fromFile, 'compute-js', computeJsDir, copyOpts);
   }
 }
