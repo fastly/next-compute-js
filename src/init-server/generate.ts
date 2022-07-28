@@ -1,5 +1,6 @@
 import path from "path";
 import fs from "fs";
+import child_process from "child_process";
 
 const COMPUTE_JS_DIR = './compute-js';
 
@@ -60,4 +61,23 @@ export function generateServerProject() {
     }
     copyResourceFile(fromFile, 'compute-js', computeJsDir, copyOpts);
   }
+
+  console.log("🚀 Compute@Edge application created!");
+
+  console.log('Installing dependencies...');
+  console.log(`npm --prefix ${COMPUTE_JS_DIR} install`);
+  child_process.spawnSync('npm', [ '--prefix', COMPUTE_JS_DIR, 'install' ], { stdio: 'inherit' });
+  console.log('');
+
+  console.log('');
+  console.log('To run your Compute@Edge application locally:');
+  console.log('');
+  console.log('  cd ' + COMPUTE_JS_DIR);
+  console.log('  fastly compute serve');
+  console.log('');
+  console.log('To build and deploy to your Compute@Edge service:');
+  console.log('');
+  console.log('  cd ' + COMPUTE_JS_DIR);
+  console.log('  fastly compute publish');
+  console.log('');
 }
