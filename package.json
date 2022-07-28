@@ -39,6 +39,7 @@
     "build/src/**/*.js",
     "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
+    "resources/**/*",
     "LICENSE",
     "README.md",
     "SECURITY.md"
