@@ -17,6 +17,7 @@
   "dependencies": {
     "arg": "^5.0.2",
     "chalk": "^4.1.2",
+    "fresh": "^0.5.2",
     "next": "12.2.2",
     "node-inspect-extracted": "^1.1.0"
   },
@@ -28,7 +29,6 @@
     "@types/node": "^18.0.6",
     "@types/sinon": "^10.0.13",
     "assert": "^2.0.0",
-    "fresh": "^0.5.2",
     "mocha": "^10.0.0",
     "nyc": "^15.1.0",
     "sinon": "^14.0.0",
