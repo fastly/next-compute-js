@@ -12,8 +12,8 @@
         "@fastly/js-compute": "^0.3.0"
     },
     "devDependencies": {
-        "@fastly/compute-js-static-publish": "^1.0.0",
-        "@fastly/next-compute-js": "^0.1.0",
+        "@fastly/compute-js-static-publish": "^2.0.0-alpha.0",
+        "@fastly/next-compute-js": "^0.1.0-alpha.0",
         "buffer": "^6.0.3",
         "core-js": "^3.19.1",
         "path-browserify": "^1.0.1",
