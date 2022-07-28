@@ -1,9 +1,9 @@
-import { ComputeJsNextRequest, ComputeJsNextResponse } from "./base-http/compute-js";
-import RenderResult from "next/dist/server/render-result";
-import type { PayloadOptions } from "next/dist/server/send-payload";
-import { setRevalidateHeaders } from "next/dist/server/send-payload/revalidate-headers";
-import { byteLength, generateETag } from "next/dist/server/api-utils/web";
 import fresh from 'fresh';
+import { byteLength, generateETag } from 'next/dist/server/api-utils/web';
+import RenderResult from 'next/dist/server/render-result';
+import type { PayloadOptions } from 'next/dist/server/send-payload';
+import { setRevalidateHeaders } from 'next/dist/server/send-payload/revalidate-headers';
+import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
 
 export async function sendRenderResult({
   req,
@@ -27,15 +27,15 @@ export async function sendRenderResult({
   }
 
   if (poweredByHeader && type === 'html') {
-    res.setHeader('X-Powered-By', 'Next.js')
+    res.setHeader('X-Powered-By', 'Next.js');
   }
 
-  const payload = result.isDynamic() ? null : result.toUnchunkedString()
+  const payload = result.isDynamic() ? null : result.toUnchunkedString();
 
   if (payload) {
-    const etag = generateEtags ? await generateETag(payload) : undefined
+    const etag = generateEtags ? await generateETag(payload) : undefined;
     if (sendEtagResponse(req, res, etag)) {
-      return
+      return;
     }
   }
 
@@ -43,27 +43,26 @@ export async function sendRenderResult({
     res.setHeader(
       'Content-Type',
       type === 'json' ? 'application/json' : 'text/html; charset=utf-8'
-    )
+    );
   }
 
   if (payload) {
-    res.setHeader('Content-Length', String(byteLength(payload)))
+    res.setHeader('Content-Length', String(byteLength(payload)));
   }
 
   if (options != null) {
-    setRevalidateHeaders(res, options)
+    setRevalidateHeaders(res, options);
   }
 
   if (req.method === 'HEAD') {
     res.send();
   } else if (payload) {
     res.body(payload);
-    res.send()
+    res.send();
   } else {
     await pipeRenderResult(result, res);
   }
 }
-
 
 export function sendEtagResponse(
   req: ComputeJsNextRequest,
@@ -77,7 +76,7 @@ export function sendEtagResponse(
      * response to the same request: Cache-Control, Content-Location, Date,
      * ETag, Expires, and Vary. https://tools.ietf.org/html/rfc7232#section-4.1
      */
-    res.setHeader('ETag', etag)
+    res.setHeader('ETag', etag);
   }
 
   if (fresh(req.headers, { etag })) {
@@ -103,12 +102,12 @@ export async function pipeRenderResult(
   const writer = res.destination.getWriter();
 
   const response = result._result;
-  const reader = response.getReader()
-  let fatalError = false
+  const reader = response.getReader();
+  let fatalError = false;
 
   try {
     while (true) {
-      const { done, value } = await reader.read()
+      const { done, value } = await reader.read();
 
       if (done) {
         res.send();

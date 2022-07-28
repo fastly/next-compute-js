@@ -1,17 +1,17 @@
 import { join, relative } from 'path';
+import { PagesManifest } from 'next/dist/build/webpack/plugins/pages-manifest-plugin';
+import { normalizeLocalePath } from 'next/dist/shared/lib/i18n/normalize-locale-path';
+import { denormalizePagePath } from 'next/dist/shared/lib/page-path/denormalize-page-path';
+import { normalizePagePath } from 'next/dist/shared/lib/page-path/normalize-page-path';
+import { MissingStaticPage, PageNotFoundError } from 'next/dist/shared/lib/utils';
 import {
   APP_PATHS_MANIFEST,
   FONT_MANIFEST,
   PAGES_MANIFEST,
   SERVER_DIRECTORY,
   SERVERLESS_DIRECTORY
-} from "next/constants";
-import { PagesManifest } from "next/dist/build/webpack/plugins/pages-manifest-plugin";
-import { Assets } from "./common";
-import { denormalizePagePath } from "next/dist/shared/lib/page-path/denormalize-page-path";
-import { normalizePagePath } from "next/dist/shared/lib/page-path/normalize-page-path";
-import { MissingStaticPage, PageNotFoundError } from "next/dist/shared/lib/utils";
-import { normalizeLocalePath } from "next/dist/shared/lib/i18n/normalize-locale-path";
+} from 'next/constants';
+import { Assets } from './common';
 
 export function getPagePath(
   assets: Assets,
@@ -26,8 +26,8 @@ export function getPagePath(
   const serverBuildPath = join(
     distDir,
     serverless && !dev ? SERVERLESS_DIRECTORY : SERVER_DIRECTORY
-  )
-  let rootPathsManifest: undefined | PagesManifest
+  );
+  let rootPathsManifest: undefined | PagesManifest;
 
   if (appDirEnabled) {
     rootPathsManifest = readAssetManifest(
@@ -43,40 +43,40 @@ export function getPagePath(
   ) as PagesManifest;
 
   try {
-    page = denormalizePagePath(normalizePagePath(page))
+    page = denormalizePagePath(normalizePagePath(page));
   } catch (err) {
-    console.error(err)
-    throw new PageNotFoundError(page)
+    console.error(err);
+    throw new PageNotFoundError(page);
   }
 
   const checkManifest = (manifest: PagesManifest) => {
-    let curPath = manifest[page]
+    let curPath = manifest[page];
 
     if (!manifest[curPath] && locales) {
-      const manifestNoLocales: typeof pagesManifest = {}
+      const manifestNoLocales: typeof pagesManifest = {};
 
       for (const key of Object.keys(manifest)) {
         manifestNoLocales[normalizeLocalePath(key, locales).pathname] =
-          pagesManifest[key]
+          pagesManifest[key];
       }
-      curPath = manifestNoLocales[page]
+      curPath = manifestNoLocales[page];
     }
-    return curPath
+    return curPath;
   }
-  let pagePath: string | undefined
+  let pagePath: string | undefined;
 
   if (rootPathsManifest) {
-    pagePath = checkManifest(rootPathsManifest)
+    pagePath = checkManifest(rootPathsManifest);
   }
 
   if (!pagePath) {
-    pagePath = checkManifest(pagesManifest)
+    pagePath = checkManifest(pagesManifest);
   }
 
   if (!pagePath) {
-    throw new PageNotFoundError(page)
+    throw new PageNotFoundError(page);
   }
-  return join(serverBuildPath, pagePath)
+  return join(serverBuildPath, pagePath);
 }
 
 export function assetDirectoryExists(
@@ -166,7 +166,7 @@ export async function requirePage(
     false,
     undefined,
     appDirEnabled
-  )
+  );
   if (pagePath.endsWith('.html')) {
     try {
       let content = readAssetFile(assets, pagePath, dir);
@@ -175,7 +175,7 @@ export async function requirePage(
       }
       return content;
     } catch(err) {
-      throw new MissingStaticPage(page, err.message)
+      throw new MissingStaticPage(page, err.message);
     }
   }
   return readAssetModule(assets, pagePath, dir);
@@ -190,7 +190,7 @@ export function requireFontManifest(
   const serverBuildPath = join(
     distDir,
     serverless ? SERVERLESS_DIRECTORY : SERVER_DIRECTORY
-  )
+  );
   return readAssetManifest(
     assets,
     join(serverBuildPath, FONT_MANIFEST),

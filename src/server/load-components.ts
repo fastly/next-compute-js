@@ -28,7 +28,6 @@ export async function loadComponents(
     };
   }
 
-
   const [DocumentMod, AppMod, ComponentMod] = await Promise.all([
     Promise.resolve().then(() =>
       requirePage(assets, '/_document', dir, distDir, serverless, appDirEnabled)
@@ -84,8 +83,8 @@ export async function loadComponents(
       false,
       undefined,
       appDirEnabled
-    )
-    isAppPath = !!pagePath?.match(/server[/\\]app[/\\]/)
+    );
+    isAppPath = !!pagePath?.match(/server[/\\]app[/\\]/);
   }
 
   return {

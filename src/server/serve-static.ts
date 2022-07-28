@@ -1,6 +1,6 @@
-import { ComputeJsNextRequest, ComputeJsNextResponse } from "./base-http/compute-js";
-import { Assets } from "./common";
-import { getAssetContentType, readAssetFile } from "./require";
+import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
+import { Assets } from './common';
+import { getAssetContentType, readAssetFile } from './require';
 
 export async function serveStatic(
   assets: Assets,
@@ -20,5 +20,4 @@ export async function serveStatic(
 
   res.body(asset);
   res.send();
-
 }

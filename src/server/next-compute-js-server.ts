@@ -1,17 +1,7 @@
-import BaseServer from 'next/dist/server/base-server';
-import { Route } from 'next/dist/server/router';
-import { addRequestMeta, NextParsedUrlQuery } from 'next/dist/server/request-meta';
-import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
-import { PagesManifest } from 'next/dist/build/webpack/plugins/pages-manifest-plugin';
-import { FontManifest } from 'next/dist/server/font-utils';
-import { PrerenderManifest } from 'next/dist/build';
-import { CustomRoutes, Rewrite } from 'next/dist/lib/load-custom-routes';
-import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
-import { RenderOpts, renderToHTML } from 'next/dist/server/render';
-import RenderResult from 'next/dist/server/render-result';
+import { join, relative, resolve } from 'path';
 import type { ParsedUrlQuery } from 'querystring';
-import { PayloadOptions } from 'next/dist/server/send-payload';
-import { join, relative, resolve } from "path";
+import type { UrlWithParsedQuery } from 'url';
+
 import {
   APP_PATHS_MANIFEST,
   BUILD_ID_FILE,
@@ -21,8 +11,28 @@ import {
   PAGES_MANIFEST,
   PRERENDER_MANIFEST,
   ROUTES_MANIFEST
-} from "next/constants";
-import { ComputeJsServerOptions } from "./common";
+} from 'next/constants';
+import { PrerenderManifest } from 'next/dist/build';
+import { PagesManifest } from 'next/dist/build/webpack/plugins/pages-manifest-plugin';
+import isError from 'next/dist/lib/is-error';
+import { CustomRoutes, Rewrite } from 'next/dist/lib/load-custom-routes';
+import { BaseNextRequest, BaseNextResponse } from 'next/dist/server/base-http';
+import BaseServer from 'next/dist/server/base-server';
+import { FontManifest } from 'next/dist/server/font-utils';
+import { addRequestMeta, NextParsedUrlQuery } from 'next/dist/server/request-meta';
+import { RenderOpts, renderToHTML } from 'next/dist/server/render';
+import RenderResult from 'next/dist/server/render-result';
+import { Route } from 'next/dist/server/router';
+import { PayloadOptions } from 'next/dist/server/send-payload';
+import { getCustomRoute } from 'next/dist/server/server-route-utils';
+import { normalizePagePath } from 'next/dist/shared/lib/page-path/normalize-page-path';
+import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
+import { getPathMatch } from 'next/dist/shared/lib/router/utils/path-match';
+import { prepareDestination } from 'next/dist/shared/lib/router/utils/prepare-destination';
+import { PageNotFoundError } from 'next/dist/shared/lib/utils';
+
+import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
+import { ComputeJsServerOptions } from './common';
 import {
   assetDirectory,
   assetDirectoryExists,
@@ -32,17 +42,9 @@ import {
   readAssetManifest,
   requireFontManifest,
 } from './require';
-import type { UrlWithParsedQuery } from "url";
-import isError from "next/dist/lib/is-error";
-import { PageNotFoundError } from "next/dist/shared/lib/utils";
-import { normalizePagePath } from "next/dist/shared/lib/page-path/normalize-page-path";
-import { loadComponents } from "./load-components";
-import { getPathMatch } from "next/dist/shared/lib/router/utils/path-match";
-import { BaseNextRequest, BaseNextResponse } from "next/dist/server/base-http";
+import { loadComponents } from './load-components';
 import { serveStatic } from './serve-static';
 import { sendRenderResult } from './send-payload';
-import { prepareDestination } from "next/dist/shared/lib/router/utils/prepare-destination";
-import { getCustomRoute } from "next/dist/server/server-route-utils";
 
 export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptions> {
   constructor(options: ComputeJsServerOptions) {
@@ -54,13 +56,13 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
      * `process.env.__NEXT_OPTIMIZE_CSS`.
      */
     if (this.renderOpts.optimizeFonts) {
-      process.env.__NEXT_OPTIMIZE_FONTS = JSON.stringify(true)
+      process.env.__NEXT_OPTIMIZE_FONTS = JSON.stringify(true);
     }
     if (this.renderOpts.optimizeCss) {
-      process.env.__NEXT_OPTIMIZE_CSS = JSON.stringify(true)
+      process.env.__NEXT_OPTIMIZE_CSS = JSON.stringify(true);
     }
     if (this.renderOpts.nextScriptWorkers) {
-      process.env.__NEXT_SCRIPT_WORKERS = JSON.stringify(true)
+      process.env.__NEXT_SCRIPT_WORKERS = JSON.stringify(true);
     }
 
     // pre-warm _document and _app as these will be
@@ -87,11 +89,11 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
   }
 
   protected loadEnvConfig(params: { dev: boolean }): void {
-    // No ENV in Fastly Compute@Edge
+    // NOTE: No ENV in Fastly Compute@Edge, at least for now
   }
 
   protected getPublicDir(): string {
-    return join(this.dir, CLIENT_PUBLIC_FILES_PATH)
+    return join(this.dir, CLIENT_PUBLIC_FILES_PATH);
   }
 
   protected getHasStaticDir(): boolean {
@@ -137,11 +139,12 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
       }
       return content.trim();
     } catch (err) {
-      if (!assetFileExists(
-        this.serverOptions.computeJs.assets,
-        buildIdFile,
-        this.dir,
-      )
+      if (
+        !assetFileExists(
+          this.serverOptions.computeJs.assets,
+          buildIdFile,
+          this.dir,
+        )
       ) {
         throw new Error(
           `Could not find a production build in the '${this.distDir}' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id`
@@ -166,11 +169,11 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
             match: getPathMatch('/static/:path*'),
             name: 'static catchall',
             fn: async (req, res, params, parsedUrl) => {
-              const p = join(this.dir, 'static', ...params.path)
-              await this.serveStatic(req, res, p, parsedUrl)
+              const p = join(this.dir, 'static', ...params.path);
+              await this.serveStatic(req, res, p, parsedUrl);
               return {
                 finished: true,
-              }
+              };
             },
           } as Route,
         ]
@@ -178,7 +181,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
   }
 
   protected setImmutableAssetCacheControl(res: BaseNextResponse): void {
-    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable')
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
   }
 
   protected generateFsStaticRoutes(): Route[] {
@@ -190,10 +193,10 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
         fn: async (req, res, params, parsedUrl) => {
           // make sure to 404 for /_next/static itself
           if (!params.path) {
-            await this.render404(req, res, parsedUrl)
+            await this.render404(req, res, parsedUrl);
             return {
               finished: true,
-            }
+            };
           }
 
           if (
@@ -206,17 +209,17 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
             params.path[0] === 'pages' ||
             params.path[1] === 'pages'
           ) {
-            this.setImmutableAssetCacheControl(res)
+            this.setImmutableAssetCacheControl(res);
           }
           const p = join(
             this.distDir,
             CLIENT_STATIC_FILES_PATH,
             ...(params.path || [])
-          )
-          await this.serveStatic(req, res, p, parsedUrl)
+          );
+          await this.serveStatic(req, res, p, parsedUrl);
           return {
             finished: true,
-          }
+          };
         },
       },
     ];
@@ -244,33 +247,33 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
         matchesBasePath: true,
         name: 'public folder catchall',
         fn: async (req, res, params, parsedUrl) => {
-          const pathParts: string[] = params.path || []
-          const { basePath } = this.nextConfig
+          const pathParts: string[] = params.path || [];
+          const { basePath } = this.nextConfig;
 
           // if basePath is defined require it be present
           if (basePath) {
-            const basePathParts = basePath.split('/')
+            const basePathParts = basePath.split('/');
             // remove first empty value
-            basePathParts.shift()
+            basePathParts.shift();
 
             if (
-              !basePathParts.every((part: string, idx: number) => {
-                return part === pathParts[idx]
-              })
+              !basePathParts.every((part: string, idx: number) =>
+                part === pathParts[idx]
+              )
             ) {
-              return { finished: false }
+              return { finished: false };
             }
 
-            pathParts.splice(0, basePathParts.length)
+            pathParts.splice(0, basePathParts.length);
           }
 
-          let path = `/${pathParts.join('/')}`
+          let path = `/${pathParts.join('/')}`;
 
           if (!publicFiles.has(path)) {
             // In `next-dev-server.ts`, we ensure encoded paths match
             // decoded paths on the filesystem. So we need do the
             // opposite here: make sure decoded paths match encoded.
-            path = encodeURI(path)
+            path = encodeURI(path);
           }
 
           if (publicFiles.has(path)) {
@@ -279,23 +282,23 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
               res,
               join(this.publicDir, ...pathParts),
               parsedUrl
-            )
+            );
             return {
               finished: true,
-            }
+            };
           }
           return {
             finished: false,
-          }
+          };
         },
       } as Route,
     ];
   }
 
-  private _validFilesystemPathSet: Set<string> | null = null
+  private _validFilesystemPathSet: Set<string> | null = null;
   protected getFilesystemPaths(): Set<string> {
     if (this._validFilesystemPathSet) {
-      return this._validFilesystemPathSet
+      return this._validFilesystemPathSet;
     }
 
     let userFilesStatic: string[] = [];
@@ -329,7 +332,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
       ...nextFilesStatic,
       ...userFilesPublic,
       ...userFilesStatic,
-    ]))
+    ]));
   }
 
   protected async sendRenderResult(
@@ -342,9 +345,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
       poweredByHeader: boolean;
       options?: PayloadOptions
     }
-
   ): Promise<void> {
-
     return await sendRenderResult({
       req,
       res,
@@ -392,6 +393,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     query: NextParsedUrlQuery,
     renderOpts: RenderOpts
   ): Promise<RenderResult | null> {
+    // TODO: revisit this
     return renderToHTML(
       {
         url: req.url,
@@ -406,7 +408,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
         disableOptimizedLoading: true,
         runtime: 'experimental-edge',
       }
-    )
+    );
   }
 
   public async serveStatic(
@@ -416,13 +418,13 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     parsedUrl?: UrlWithParsedQuery
   ): Promise<void> {
     if (!this.isServeableUrl(path)) {
-      return this.render404(req, res, parsedUrl)
+      return this.render404(req, res, parsedUrl);
     }
 
     if (!(req.method === 'GET' || req.method === 'HEAD')) {
-      res.statusCode = 405
-      res.setHeader('Allow', ['GET', 'HEAD'])
-      return this.renderError(null, req, res, path)
+      res.statusCode = 405;
+      res.setHeader('Allow', ['GET', 'HEAD']);
+      return this.renderError(null, req, res, path);
     }
 
     try {
@@ -430,17 +432,17 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
         req as ComputeJsNextRequest,
         res as ComputeJsNextResponse,
         path
-      )
+      );
     } catch (error) {
-      if (!isError(error)) throw error
-      const err = error as Error & { code?: string; statusCode?: number }
+      if (!isError(error)) throw error;
+      const err = error as Error & { code?: string; statusCode?: number };
       if (err.code === 'ENOENT' || err.statusCode === 404) {
-        this.render404(req, res, parsedUrl)
+        await this.render404(req, res, parsedUrl);
       } else if (err.statusCode === 412) {
-        res.statusCode = 412
-        return this.renderError(err, req, res, path)
+        res.statusCode = 412;
+        return this.renderError(err, req, res, path);
       } else {
-        throw err
+        throw err;
       }
     }
   }
@@ -454,7 +456,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     // 2. resolve:
     //    https://github.com/pillarjs/send/blob/de073ed3237ade9ff71c61673a34474b30e5d45b/index.js#L561
 
-    let decodedUntrustedFilePath: string
+    let decodedUntrustedFilePath: string;
     try {
       // (1) Decode the URL so we have the proper file name
       decodedUntrustedFilePath = decodeURIComponent(untrustedFileUrl);
@@ -485,9 +487,9 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
   }: {
     restrictedRedirectPaths: string[]
   }) {
-    let beforeFiles: Route[] = []
-    let afterFiles: Route[] = []
-    let fallback: Route[] = []
+    let beforeFiles: Route[] = [];
+    let afterFiles: Route[] = [];
+    let fallback: Route[] = [];
 
     if (!this.minimalMode) {
       const buildRewrite = (rewrite: Rewrite, check = true): Route => {
@@ -495,7 +497,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
           type: 'rewrite',
           rule: rewrite,
           restrictedRedirectPaths,
-        })
+        });
         return {
           ...rewriteRoute,
           check,
@@ -512,7 +514,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
               destination: rewriteRoute.destination,
               params: params,
               query: parsedUrl.query,
-            })
+            });
 
             // external rewrite, proxy it
             if (parsedDestination.protocol) {
@@ -525,14 +527,14 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
               // )
             }
 
-            addRequestMeta(req, '_nextRewroteUrl', newUrl)
-            addRequestMeta(req, '_nextDidRewrite', newUrl !== req.url)
+            addRequestMeta(req, '_nextRewroteUrl', newUrl);
+            addRequestMeta(req, '_nextDidRewrite', newUrl !== req.url);
 
             return {
               finished: false,
               pathname: newUrl,
               query: parsedDestination.query,
-            }
+            };
           },
         }
       }
@@ -572,7 +574,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
       this.renderOpts.dev,
       locales,
       this.nextConfig.experimental.appDir
-    )
+    );
   }
 
   protected async findPageComponents(
@@ -584,7 +586,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
       // try serving a static AMP version first
       query.amp ? normalizePagePath(pathname) + '.amp' : null,
       pathname,
-    ].filter(Boolean)
+    ].filter(Boolean);
 
     if (query.__nextLocale) {
       paths = [
@@ -592,7 +594,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
           (path) => `/${query.__nextLocale}${path === '/' ? '' : path}`
         ),
         ...paths,
-      ]
+      ];
     }
 
     for (const pagePath of paths) {
