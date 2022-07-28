@@ -5,6 +5,9 @@
   "description": "Next.js for Fastly Compute@Edge",
   "main": "./build/src/index.js",
   "types": "./build/src/index.d.ts",
+  "bin": {
+    "next-compute-js": "./build/src/bin/next-compute-js.js"
+  },
   "scripts": {
     "prepack": "yarn clean && yarn test && yarn compile",
     "compile": "tsc --build tsconfig.json",
@@ -12,6 +15,7 @@
     "test": "nyc ts-mocha -p tsconfig.json --require test/mocha_bootstrap.js test/testHelpers.ts test/**/*.test.ts"
   },
   "dependencies": {
+    "arg": "^5.0.2",
     "next": "12.2.2",
     "node-inspect-extracted": "^1.1.0"
   },
