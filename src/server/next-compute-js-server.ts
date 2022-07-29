@@ -433,6 +433,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
       method: req.request.method,
       headers,
       body: req.request.body,
+      cacheOverride: new CacheOverride('pass'),
     });
     const buffer = Buffer.from(await response.arrayBuffer());
     res.statusCode = response.status;
