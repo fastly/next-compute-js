@@ -390,14 +390,13 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     if(!(req instanceof ComputeJsNextRequest) ||
       !(res instanceof ComputeJsNextResponse)
     ) {
-      throw 'unexpected';
+      throw new Error('Unexpected');
     }
 
     const backend = getBackendInfo(this.serverOptions.computeJs.backends, target);
     if(backend == null) {
-      // Unable to proxy.
-      // This is probably an error.
-      throw `Backend not found for '${target}'`;
+      // Unable to proxy, due to no backend
+      throw new Error(`Backend not found for '${target}'`);
     }
 
     const headers: Record<string, string> = {};
