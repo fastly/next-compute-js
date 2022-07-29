@@ -1,6 +1,6 @@
 {
   "name": "@fastly/next-compute-js",
-  "version": "0.1.0-alpha.9",
+  "version": "0.1.0-alpha.10",
   "license": "MIT",
   "description": "Next.js for Fastly Compute@Edge",
   "main": "./build/src/index.js",
@@ -11,7 +11,7 @@
   "scripts": {
     "prepack": "yarn clean && yarn test && yarn compile",
     "compile": "tsc --build tsconfig.json",
-    "clean": "tsc --build --clean tsconfig.json",
+    "clean": "rm -rf build",
     "test": "nyc ts-mocha -p tsconfig.json --require test/mocha_bootstrap.js test/testHelpers.ts test/**/*.test.ts"
   },
   "dependencies": {
