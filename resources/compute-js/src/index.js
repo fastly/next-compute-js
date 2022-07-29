@@ -31,7 +31,7 @@ const server = new NextComputeJsServer({
 const requestHandler = server.getRequestHandler();
 
 async function handleRequest(event) {
-  const nextRequest = new ComputeJsNextRequest(event.request);
+  const nextRequest = new ComputeJsNextRequest(event.request, event.client);
   const nextResponse = new ComputeJsNextResponse();
 
   await requestHandler(nextRequest, nextResponse);
