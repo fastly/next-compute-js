@@ -34,7 +34,7 @@ import { PageNotFoundError } from 'next/dist/shared/lib/utils';
 
 import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
 import { ComputeJsServerOptions } from './common';
-import { getBackendName } from './compute-js';
+import { getBackendInfo } from './compute-js';
 import {
   assetDirectory,
   assetDirectoryExists,
@@ -397,7 +397,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
       };
     }
 
-    const backend = getBackendName(this.serverOptions.computeJs.backends, target);
+    const backend = getBackendInfo(this.serverOptions.computeJs.backends, target);
     if(backend == null) {
       // Unable to proxy.
       // This is probably an error.
@@ -409,7 +409,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     const headers: Record<string, string> = {};
 
     // Origin
-    headers['origin'] = this.serverOptions.computeJs.backends![backend].host;
+    headers['origin'] = backend.host;
 
     // XFF
     const url = new URL(req.url);
@@ -435,7 +435,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     });
 
     const response = await fetch(target, {
-      backend,
+      backend: backend.name,
       method: req.request.method,
       headers,
       body: req.request.body,

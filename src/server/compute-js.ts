@@ -1,15 +1,32 @@
 import { Backends } from "./common";
+export type BackendInfo = {
+  name: string,
+  host: string,
+};
 
-function findBackendName(backends: Backends, host: string) {
+function findBackendInfo(backends: Backends, host: string): BackendInfo | null {
   for (const [backendName, backend] of Object.entries(backends)) {
-    if(host === backend.host) {
-      return backendName;
+    let isMatch = false;
+    if(typeof backend === 'string') {
+      if(host === backend) {
+        isMatch = true;
+      }
+    } else {
+      if(host === backend.host) {
+        isMatch = true;
+      }
+    }
+    if(isMatch) {
+      return {
+        name: backendName,
+        host,
+      };
     }
   }
   return null;
 }
 
-export function getBackendName(backends: Backends | undefined, url: string) {
+export function getBackendInfo(backends: Backends | undefined, url: string) {
   if(backends == null) {
     return null;
   }
@@ -19,14 +36,14 @@ export function getBackendName(backends: Backends | undefined, url: string) {
   const hostname = urlObj.hostname;
   const port = urlObj.port;
 
-  let backendName: string | null;
+  let backendName;
 
   if(port !== '') {
-    backendName = findBackendName(backends, hostname + ':' + port);
+    backendName = findBackendInfo(backends, hostname + ':' + port);
   } else {
-    backendName = findBackendName(backends, hostname + ':443');
+    backendName = findBackendInfo(backends, hostname + ':443');
     if(backendName == null) {
-      backendName = findBackendName(backends, hostname);
+      backendName = findBackendInfo(backends, hostname);
     }
   }
 
