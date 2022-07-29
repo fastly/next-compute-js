@@ -3,9 +3,10 @@ import { BaseNextRequest, BaseNextResponse } from 'next/dist/server/base-http';
 
 export class ComputeJsNextRequest extends BaseNextRequest<ReadableStream | null> {
   public request: Request;
+  public clientInfo: ClientInfo;
   public headers: IncomingHttpHeaders;
 
-  public constructor(request: Request) {
+  public constructor(request: Request, clientInfo: ClientInfo) {
     const url = new URL(request.url);
 
     super(
@@ -17,6 +18,7 @@ export class ComputeJsNextRequest extends BaseNextRequest<ReadableStream | null>
     // The dependency at the moment will be Next.js <= 12.2.2
     // until request.clone() works.
     this.request = request;
+    this.clientInfo = clientInfo;
 
     this.headers = {};
     for (const [name, value] of request.headers.entries()) {

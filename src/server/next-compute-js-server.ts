@@ -1,6 +1,6 @@
 import { join, relative, resolve } from 'path';
 import type { ParsedUrlQuery } from 'querystring';
-import type { UrlWithParsedQuery } from 'url';
+import { UrlWithParsedQuery, format as formatUrl } from 'url';
 
 import {
   APP_PATHS_MANIFEST,
@@ -17,7 +17,7 @@ import { PagesManifest } from 'next/dist/build/webpack/plugins/pages-manifest-pl
 import isError from 'next/dist/lib/is-error';
 import { CustomRoutes, Rewrite } from 'next/dist/lib/load-custom-routes';
 import { BaseNextRequest, BaseNextResponse } from 'next/dist/server/base-http';
-import BaseServer from 'next/dist/server/base-server';
+import BaseServer, { stringifyQuery } from 'next/dist/server/base-server';
 import { FontManifest } from 'next/dist/server/font-utils';
 import { addRequestMeta, NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { RenderOpts, renderToHTML } from 'next/dist/server/render';
@@ -27,12 +27,14 @@ import { PayloadOptions } from 'next/dist/server/send-payload';
 import { getCustomRoute } from 'next/dist/server/server-route-utils';
 import { normalizePagePath } from 'next/dist/shared/lib/page-path/normalize-page-path';
 import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
+import { ParsedUrl } from 'next/dist/shared/lib/router/utils/parse-url';
 import { getPathMatch } from 'next/dist/shared/lib/router/utils/path-match';
 import { prepareDestination } from 'next/dist/shared/lib/router/utils/prepare-destination';
 import { PageNotFoundError } from 'next/dist/shared/lib/utils';
 
 import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
 import { ComputeJsServerOptions } from './common';
+import { getBackendName } from './compute-js';
 import {
   assetDirectory,
   assetDirectoryExists,
@@ -374,6 +376,83 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     // TODO: Do some compression() -like thing
   }
 
+  protected async proxyRequest(
+    req: BaseNextRequest,
+    res: BaseNextResponse,
+    parsedUrl: ParsedUrl
+  ) {
+    const { query } = parsedUrl;
+    delete (parsedUrl as any).query;
+    parsedUrl.search = stringifyQuery(req, query);
+
+    const target = formatUrl(parsedUrl);
+
+    if(!(req instanceof ComputeJsNextRequest) ||
+      !(res instanceof ComputeJsNextResponse)
+    ) {
+      // Unable to proxy.
+      // This is probably an error.
+      return {
+        finished: false,
+      };
+    }
+
+    const backend = getBackendName(this.serverOptions.computeJs.backends, target);
+    if(backend == null) {
+      // Unable to proxy.
+      // This is probably an error.
+      return {
+        finished: false,
+      };
+    }
+
+    const headers: Record<string, string> = {};
+
+    // Origin
+    headers['origin'] = this.serverOptions.computeJs.backends![backend].host;
+
+    // XFF
+    const url = new URL(req.url);
+    const port = url.port || '443'; // C@E can only be on 443, except when running locally
+
+    const values: Record<string, string> = {
+      for: req.clientInfo.address,
+      port,
+      proto: 'https', // C@E can only be accessed via HTTPS
+    };
+
+    ['for', 'port', 'proto'].forEach(function(header) {
+      const arr: string[] = [];
+      let strs = req.headers['x-forwarded-' + header];
+      if(Array.isArray(strs)) {
+        strs = strs.join(',');
+      }
+      if(strs) {
+        arr.push(strs);
+      }
+      arr.push(values[header]);
+      headers['x-forwarded-' + header] = arr.join(',');
+    });
+
+    const response = await fetch(target, {
+      backend,
+      method: req.request.method,
+      headers,
+      body: req.request.body,
+    });
+
+    response.headers.forEach((value, name) => {
+      res.setHeader(name, value);
+    });
+
+    await response.body.pipeTo(res.transformStream.writable);
+    res.send();
+
+    return {
+      finished: true,
+    };
+  }
+
   protected async runApi(
     req: ComputeJsNextRequest,
     res: ComputeJsNextResponse,
@@ -520,11 +599,11 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
             if (parsedDestination.protocol) {
               // TODO: We need an implementation that uses fetch() and can only go to preregistered backends
               // or maybe we can use Dynamic Backends feature once it's available
-              // return this.proxyRequest(
-              //   req as NodeNextRequest,
-              //   res as NodeNextResponse,
-              //   parsedDestination
-              // )
+              return this.proxyRequest(
+                req,
+                res,
+                parsedDestination
+              );
             }
 
             addRequestMeta(req, '_nextRewroteUrl', newUrl);

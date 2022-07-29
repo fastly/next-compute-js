@@ -8,9 +8,14 @@ export interface ComputeJsAsset {
 }
 
 export type Assets = Record<string, ComputeJsAsset>;
+export type Backend = {
+  host: string
+};
+export type Backends = Record<string, Backend>;
 
 export interface ComputeJsOptions {
   assets: Assets;
+  backends?: Backends;
 }
 
 export interface ComputeJsServerOptions extends Options {
