@@ -428,18 +428,18 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
       headers['x-forwarded-' + header] = arr.join(',');
     });
 
-    const response = await fetch(target, {
+    const response = await fetch(backend.target, {
       backend: backend.name,
       method: req.request.method,
       headers,
       body: req.request.body,
     });
-
+    const buffer = Buffer.from(await response.arrayBuffer());
+    res.statusCode = response.status;
     response.headers.forEach((value, name) => {
       res.setHeader(name, value);
     });
-
-    await response.body.pipeTo(res.transformStream.writable);
+    res.body(buffer);
     res.send();
 
     return {

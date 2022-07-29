@@ -2,6 +2,7 @@ import { Backends } from "./common";
 export type BackendInfo = {
   name: string,
   url: string,
+  target: string,
 };
 
 function findBackendInfo(backends: Backends, url: string): BackendInfo | null {
@@ -14,6 +15,7 @@ function findBackendInfo(backends: Backends, url: string): BackendInfo | null {
       return {
         name: backendName,
         url: backendUrl,
+        target: '/' + url.slice(backendUrl.length),
       };
     }
   }
