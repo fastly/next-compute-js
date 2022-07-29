@@ -8,7 +8,7 @@ export interface ComputeJsAsset {
 }
 
 export type Assets = Record<string, ComputeJsAsset>;
-export type Backend = string | { host: string }; // if string is provided, it is assumed to be host
+export type Backend = string | { url: string }; // if string is provided, it is assumed to be url
 export type Backends = Record<string, Backend>;
 
 export interface ComputeJsOptions {

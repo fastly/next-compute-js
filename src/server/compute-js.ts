@@ -1,25 +1,19 @@
 import { Backends } from "./common";
 export type BackendInfo = {
   name: string,
-  host: string,
+  url: string,
 };
 
-function findBackendInfo(backends: Backends, host: string): BackendInfo | null {
+function findBackendInfo(backends: Backends, url: string): BackendInfo | null {
   for (const [backendName, backend] of Object.entries(backends)) {
-    let isMatch = false;
-    if(typeof backend === 'string') {
-      if(host === backend) {
-        isMatch = true;
-      }
-    } else {
-      if(host === backend.host) {
-        isMatch = true;
-      }
+    let backendUrl = typeof backend === 'string' ? backend : backend.url;
+    if(!backendUrl.endsWith('/')) {
+      backendUrl += '/';
     }
-    if(isMatch) {
+    if(url.startsWith(backendUrl)) {
       return {
         name: backendName,
-        host,
+        url: backendUrl,
       };
     }
   }
@@ -31,20 +25,20 @@ export function getBackendInfo(backends: Backends | undefined, url: string) {
     return null;
   }
 
-  const urlObj = new URL(url);
-
-  const hostname = urlObj.hostname;
-  const port = urlObj.port;
-
   let backendName;
 
-  if(port !== '') {
-    backendName = findBackendInfo(backends, hostname + ':' + port);
-  } else {
-    backendName = findBackendInfo(backends, hostname + ':443');
-    if(backendName == null) {
-      backendName = findBackendInfo(backends, hostname);
+  const urlObj = new URL(url);
+  if(urlObj.port === '') {
+    // If port is not specified, try the default port
+    if (urlObj.protocol === 'https:') {
+      urlObj.port = '443';
+    } else {
+      urlObj.port = '80';
     }
+    backendName = findBackendInfo(backends, String(urlObj));
+  }
+  if(backendName == null) {
+    backendName = findBackendInfo(backends, url);
   }
 
   return backendName;

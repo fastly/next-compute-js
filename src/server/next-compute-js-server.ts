@@ -390,35 +390,30 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     if(!(req instanceof ComputeJsNextRequest) ||
       !(res instanceof ComputeJsNextResponse)
     ) {
-      // Unable to proxy.
-      // This is probably an error.
-      return {
-        finished: false,
-      };
+      throw 'unexpected';
     }
 
     const backend = getBackendInfo(this.serverOptions.computeJs.backends, target);
     if(backend == null) {
       // Unable to proxy.
       // This is probably an error.
-      return {
-        finished: false,
-      };
+      throw `Backend not found for '${target}'`;
     }
 
     const headers: Record<string, string> = {};
 
-    // Origin
-    headers['origin'] = backend.host;
+    // Rewrite host header
+    headers['host'] = new URL(backend.url).host;
 
     // XFF
-    const url = new URL(req.url);
-    const port = url.port || '443'; // C@E can only be on 443, except when running locally
+    const url = new URL(req.request.url);
+    const port = url.port || '443';       // C@E can only be on 443, except when running locally
+    const proto = 'https';                // C@E can only be accessed via HTTPS
 
     const values: Record<string, string> = {
       for: req.clientInfo.address,
       port,
-      proto: 'https', // C@E can only be accessed via HTTPS
+      proto,
     };
 
     ['for', 'port', 'proto'].forEach(function(header) {
