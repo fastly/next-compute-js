@@ -12,14 +12,16 @@
         "@fastly/js-compute": "^0.3.0"
     },
     "devDependencies": {
-        "@fastly/compute-js-static-publish": "^2.0.0-alpha.0",
-        "@fastly/next-compute-js": "^0.1.0-alpha.0",
+        "@fastly/compute-js-static-publish": "^2.0.0-alpha.1",
+        "@fastly/next-compute-js": "^0.1.0-alpha.23",
         "buffer": "^6.0.3",
         "core-js": "^3.19.1",
+        "crypto-browserify": "^3.12.0",
+        "os-browserify": "^0.3.0",
         "path-browserify": "^1.0.1",
         "process": "^0.11.10",
-        "react": "^17.0.2",
-        "react-dom": "^17.0.2",
+        "querystring-es3": "^0.2.1",
+        "stream-browserify": "^3.0.0",
         "url": "^0.11.0",
         "webpack": "^5.64.0",
         "webpack-cli": "^4.9.1"

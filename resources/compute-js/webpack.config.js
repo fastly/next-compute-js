@@ -3,8 +3,11 @@ const webpack = require("webpack");
 
 module.exports = {
   entry: "./src/index.js",
+  experiments: {
+    topLevelAwait: true
+  },
   optimization: {
-    minimize: false,
+    minimize: true,
   },
   target: "webworker",
   output: {
@@ -13,7 +16,7 @@ module.exports = {
     libraryTarget: "this",
   },
   module: {
-    // Asset modules are modules that allow the use asset files (fonts, icons, etc) 
+    // Asset modules are modules that allow the use asset files (fonts, icons, etc)
     // without additional configuration or dependencies.
     rules: [
       // asset/source exports the source code of the asset.
@@ -56,6 +59,7 @@ module.exports = {
     new webpack.EnvironmentPlugin({
       NEXT_RUNTIME: 'edge',
       NEXT_PRIVATE_MINIMAL_MODE: false,
+      NEXT_COMPUTE_JS: true
     }),
   ],
   resolve: {
@@ -64,8 +68,12 @@ module.exports = {
     },
     fallback: {
       "buffer": require.resolve("buffer/"),
+      "crypto": require.resolve("crypto-browserify/"),
+      "os": require.resolve("os-browserify/browser"),
       "path": require.resolve("path-browserify"),
       "process": require.resolve("process/browser"),
+      "querystring": require.resolve("querystring-es3"),
+      "stream": require.resolve("stream-browserify"),
       "url": require.resolve("url/"),
     }
   },

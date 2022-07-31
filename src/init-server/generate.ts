@@ -45,6 +45,7 @@ export function generateServerProject() {
     'src/polyfill.js',
     ['_gitignore', '.gitignore'],
     '.node-version',
+    '.npmrc',
     'default-content-types.cjs',
     'fastly.toml',
     'package.json',
