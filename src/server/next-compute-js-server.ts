@@ -40,7 +40,7 @@ import {
   assetDirectoryExists,
   assetFileExists,
   getPagePath,
-  readAssetFile,
+  readAssetFileAsString,
   readAssetManifest,
   requireFontManifest,
 } from './require';
@@ -131,14 +131,11 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     const buildIdFile = join(this.distDir, BUILD_ID_FILE);
 
     try {
-      let content = readAssetFile(
+      const content = readAssetFileAsString(
         this.serverOptions.computeJs.assets,
         buildIdFile,
         this.dir
       );
-      if(typeof content !== 'string') {
-        content = content.toString('utf8');
-      }
       return content.trim();
     } catch (err) {
       if (
