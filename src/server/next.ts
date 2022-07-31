@@ -7,6 +7,7 @@ export default async function createServer(options: ComputeJsServerOptions) {
 
   const conf = await loadConfig(
     PHASE_PRODUCTION_SERVER,
+    options.computeJs.assets,
     options.dir ?? '.',
     options.conf,
   );

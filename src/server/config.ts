@@ -1,9 +1,13 @@
 import chalk from 'chalk'
 import * as Log from 'next/dist/build/output/log'
-import { defaultConfig, ExperimentalConfig, NextConfigComplete } from 'next/dist/server/config-shared';
+import { defaultConfig, ExperimentalConfig, NextConfigComplete, normalizeConfig } from 'next/dist/server/config-shared';
 import { execOnce } from 'next/dist/shared/lib/utils';
 import { ImageConfig, imageConfigDefault, VALID_LOADERS } from "next/dist/shared/lib/image-config";
-import { isAbsolute, join, resolve } from "path";
+import { basename, extname, isAbsolute, relative, resolve } from "path";
+import { Assets } from "./common";
+import { CONFIG_FILES } from "next/constants";
+
+const targets = [ 'server' /*, 'serverless', 'experimental-serverless-trace'*/];
 
 const experimentalWarning = execOnce(
   (configFileName: string, features: string[]) => {
@@ -722,6 +726,7 @@ function assignDefaults(userConfig: { [key: string]: any }) {
 
 export async function loadConfig(
   phase: string,
+  assets: Assets,
   dir: string,
   customConfig?: object | null,
 ) {
@@ -738,9 +743,100 @@ export async function loadConfig(
     }) as NextConfigComplete
   }
 
-  const path = join(dir, configFileName);
+  let path: string | null = null;
+  for(const configFile of CONFIG_FILES) {
+    if ('/' + configFile in assets) {
+      path = configFile;
+      break;
+    }
+  }
 
-  console.log({path});
+  if(path?.length) {
+    configFileName = basename(path);
+    let userConfigModule: any;
+    try {
+      userConfigModule = assets['/' + path].module;
+    } catch (err) {
+      Log.error(
+        `Failed to load ${configFileName}, see more info here https://nextjs.org/docs/messages/next-config-error`
+      );
+      throw err;
+    }
+    const userConfig = await normalizeConfig(
+      phase,
+      userConfigModule.default || userConfigModule
+    )
 
-  return {};
+    if (Object.keys(userConfig).length === 0) {
+      Log.warn(
+        `Detected ${configFileName}, no exported configuration found. https://nextjs.org/docs/messages/empty-configuration`
+      )
+    }
+
+    if (userConfig.target && !targets.includes(userConfig.target)) {
+      throw new Error(
+        `Specified target is invalid. Provided: "${
+          userConfig.target
+        }" should be one of ${targets.join(', ')}`
+      )
+    }
+
+    if (userConfig.target && userConfig.target !== 'server') {
+      Log.warn(
+        'The `target` config is deprecated and will be removed in a future version.\n' +
+          'See more info here https://nextjs.org/docs/messages/deprecated-target-config'
+      )
+    }
+
+    if (userConfig.amp?.canonicalBase) {
+      const { canonicalBase } = userConfig.amp || ({} as any)
+      userConfig.amp = userConfig.amp || {}
+      userConfig.amp.canonicalBase =
+        (canonicalBase.endsWith('/')
+          ? canonicalBase.slice(0, -1)
+          : canonicalBase) || ''
+    }
+
+    if (process.env.NEXT_PRIVATE_TARGET) {
+      userConfig.target = process.env.NEXT_PRIVATE_TARGET;
+    }
+
+    return assignDefaults({
+      configOrigin: relative(dir, path),
+      configFile: path,
+      configFileName,
+      ...userConfig,
+    }) as NextConfigComplete
+  } else {
+    const configBaseName = basename(CONFIG_FILES[0], extname(CONFIG_FILES[0]))
+
+    const checkFiles = [
+      `${configBaseName}.jsx`,
+      `${configBaseName}.ts`,
+      `${configBaseName}.tsx`,
+      `${configBaseName}.json`,
+    ];
+
+    let nonJsPath: string | null = null;
+    for(const file of checkFiles) {
+      if ('/' + file in assets) {
+        nonJsPath = file;
+        break;
+      }
+    }
+
+    if(nonJsPath?.length) {
+      throw new Error(
+        `Configuring Next.js via '${basename(
+          nonJsPath
+        )}' is not supported. Please replace the file with 'next.config.js' or 'next.config.mjs'.`
+      );
+    }
+  }
+
+  // always call assignDefaults to ensure settings like
+  // reactRoot can be updated correctly even with no next.config.js
+  const completeConfig = assignDefaults(defaultConfig) as NextConfigComplete;
+  completeConfig.configFileName = configFileName;
+  return completeConfig;
 }
