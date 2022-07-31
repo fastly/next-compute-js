@@ -6,5 +6,11 @@
 /// <reference types="@fastly/js-compute" />
 
 import './core';
-export { ComputeJsNextRequest, ComputeJsNextResponse } from './server/base-http/compute-js';
-export * from './server/next';
+import { ComputeJsNextRequest, ComputeJsNextResponse } from './server/base-http/compute-js';
+import createServer, { NextServer } from './server/next';
+
+export {
+  NextServer, ComputeJsNextResponse, ComputeJsNextRequest
+};
+
+export default createServer;
