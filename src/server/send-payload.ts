@@ -101,7 +101,7 @@ export function sendEtagResponse(
 
   if (fresh(req.headers, { etag })) {
     res.statusCode = 304;
-    res.body('');
+    res.body(null);
     res.send();
     return true;
   }

@@ -35,13 +35,18 @@ export class ComputeJsNextResponse extends BaseNextResponse<WritableStream> {
   private headers = new Headers();
   private bodyContent: string | Buffer | undefined = undefined;
   private _sent = false;
+  private emptyBody = false;
 
   private sendPromise = new Promise<void>((resolve) => {
     this.sendResolve = resolve;
   })
   private sendResolve?: () => void;
   private response = this.sendPromise.then(() => {
-    return new Response(this.bodyContent ?? this.transformStream.readable, {
+    let body: BodyInit = null;
+    if(!this.emptyBody) {
+      body = this.bodyContent ?? this.transformStream.readable;
+    }
+    return new Response(body, {
       headers: this.headers,
       status: this.statusCode,
       // statusMessage will be available in upcoming js-compute-runtime version.
@@ -88,8 +93,12 @@ export class ComputeJsNextResponse extends BaseNextResponse<WritableStream> {
     return this;
   }
 
-  body(value: string | Buffer) {
-    this.bodyContent = value;
+  body(value: string | Buffer | null) {
+    if(value == null) {
+      this.emptyBody = true;
+    } else {
+      this.bodyContent = value;
+    }
     return this;
   }
 
