@@ -94,9 +94,15 @@ The following Next.js features are supported:
 * Link object
 * Router object / Imperative Routing / Shallow Routing
 * Static Generation without Data
+* Server-Side Generation with Static Props / Static Paths
+* Server-Side Rendering with Server-Side Props
 * Client-Side fetching
 * SWR
 * Built-in CSS / CSS Modules
+* ETag generation
+* Rewrites
+* Redirects
+* Internationalized Routing
 * Layouts
 * Font Optimization
 * Headers
@@ -107,11 +113,6 @@ The following Next.js features are supported:
 
 The following features are not yet supported, but are on the radar:
 
-* Rewrites
-* Redirects
-* Internationalized Routing
-* Server-Side Generation with Static Props / Static Paths
-* Server-Side Rendering with Server-Side Props
 * API Routes / API Middleware
 * Image Optimization
 * Preview Mode
