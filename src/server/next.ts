@@ -4,7 +4,7 @@ import { PHASE_PRODUCTION_SERVER } from "next/constants";
 import NextComputeJsServer from "./next-compute-js-server";
 import { ComputeJsNextRequest, ComputeJsNextResponse } from "./base-http/compute-js";
 
-class NextServer {
+export class NextServer {
   public options: ComputeJsServerOptions;
   public server: NextComputeJsServer | null;
 
