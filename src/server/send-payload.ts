@@ -1,5 +1,5 @@
 import fresh from 'fresh';
-import { byteLength, generateETag } from 'next/dist/server/api-utils/web';
+import generateETag from 'etag';
 import RenderResult from 'next/dist/server/render-result';
 import type { PayloadOptions } from 'next/dist/server/send-payload';
 import { setRevalidateHeaders } from 'next/dist/server/send-payload/revalidate-headers';
@@ -47,7 +47,7 @@ export async function sendRenderResult({
   }
 
   if (payload) {
-    res.setHeader('Content-Length', String(byteLength(payload)));
+    res.setHeader('Content-Length', String(Buffer.byteLength(payload)));
   }
 
   if (options != null) {
