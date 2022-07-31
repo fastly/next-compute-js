@@ -117,6 +117,22 @@ export function readAssetFile(
   return file.content;
 }
 
+export function readAssetFileAsString(
+  assets: Assets,
+  path: string,
+  dir: string,
+) {
+  let content = readAssetFile(
+    assets,
+    path,
+    dir
+  );
+  if(typeof content !== 'string') {
+    content = content.toString('utf8');
+  }
+  return content;
+}
+
 export function getAssetContentType(
   assets: Assets,
   path: string,
@@ -132,10 +148,7 @@ export function readAssetManifest(
   path: string,
   dir: string,
 ) {
-  let content = readAssetFile(assets, path, dir);
-  if(typeof content !== 'string') {
-    content = content.toString('utf8');
-  }
+  let content = readAssetFileAsString(assets, path, dir);
   return JSON.parse(content);
 }
 
@@ -169,11 +182,7 @@ export async function requirePage(
   );
   if (pagePath.endsWith('.html')) {
     try {
-      let content = readAssetFile(assets, pagePath, dir);
-      if(typeof content !== 'string') {
-        content = content.toString('utf8');
-      }
-      return content;
+      return readAssetFileAsString(assets, pagePath, dir);
     } catch(err) {
       throw new MissingStaticPage(page, err.message);
     }
