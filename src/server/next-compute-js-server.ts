@@ -30,7 +30,7 @@ import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 import { ParsedUrl } from 'next/dist/shared/lib/router/utils/parse-url';
 import { getPathMatch } from 'next/dist/shared/lib/router/utils/path-match';
 import { prepareDestination } from 'next/dist/shared/lib/router/utils/prepare-destination';
-import { PageNotFoundError } from 'next/dist/shared/lib/utils';
+import { CacheFs, PageNotFoundError } from 'next/dist/shared/lib/utils';
 
 import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
 import { ComputeJsServerOptions } from './common';
@@ -731,6 +731,39 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     return undefined;
   }
 
+  // We're going to use the time the build happened as the last modified time for the
+  // sake of the cache file system for now.
+  private static _mtime = new Date();
+  protected override getCacheFilesystem(): CacheFs {
+    return {
+      readFile: (f) => {
+        const content = readAssetFileAsString(
+          this.serverOptions.computeJs.assets,
+          f,
+          this.dir
+        );
+        return Promise.resolve(content);
+      },
+      readFileSync: (f) => {
+        return readAssetFileAsString(
+          this.serverOptions.computeJs.assets,
+          f,
+          this.dir
+        );
+      },
+      writeFile: (f, d) => {
+        throw new Error("Writing to cache not currently supported");
+      },
+      mkdir: (dir) => {
+        // writing to cache not currently supported, but silently succeed on mkdir for now
+        return Promise.resolve();
+      },
+      stat: (f) => {
+        return Promise.resolve({mtime: NextComputeJsServer._mtime});
+      },
+    }
+  }
+
   private _cachedPreviewManifest: PrerenderManifest | undefined
   protected getPrerenderManifest(): PrerenderManifest {
     if (this._cachedPreviewManifest) {
@@ -750,6 +783,16 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     return readAssetManifest(
       this.serverOptions.computeJs.assets,
       routesManifestFile,
+      this.dir
+    );
+  }
+
+  protected override async getFallback(page: string) {
+    const pagePath = normalizePagePath(page);
+    const fullPagePath = join(this.serverDistDir, 'pages', `${pagePath}.html`);
+    return readAssetFileAsString(
+      this.serverOptions.computeJs.assets,
+      fullPagePath,
       this.dir
     );
   }
