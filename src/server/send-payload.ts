@@ -1,9 +1,29 @@
+import crypto from 'crypto';
 import fresh from 'fresh';
-import generateETag from 'etag';
 import RenderResult from 'next/dist/server/render-result';
 import type { PayloadOptions } from 'next/dist/server/send-payload';
 import { setRevalidateHeaders } from 'next/dist/server/send-payload/revalidate-headers';
 import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
+
+// Calculate the ETag for a payload.
+export async function generateETag(payload: string) {
+  if (payload.length === 0) {
+    // fast-path empty
+    return '"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"'
+  }
+
+  // compute hash of entity
+  const hash = crypto
+    .createHash('sha1')
+    .update(payload, 'utf8')
+    .digest('base64')
+    .substring(0, 27)
+
+  // compute length of entity
+  const len = Buffer.byteLength(payload)
+
+  return '"' + len.toString(16) + '-' + hash + '"'
+}
 
 export async function sendRenderResult({
   req,
