@@ -4,6 +4,7 @@ import RenderResult from 'next/dist/server/render-result';
 import type { PayloadOptions } from 'next/dist/server/send-payload';
 import { setRevalidateHeaders } from 'next/dist/server/send-payload/revalidate-headers';
 import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
+import { ComputeJsIncomingMessage, ComputeJsServerResponse } from "@fastly/http-compute-js";
 
 // Calculate the ETag for a payload.
 export function generateETag(payload: string) {
@@ -85,8 +86,8 @@ export async function sendRenderResult({
 }
 
 export function sendEtagResponse(
-  req: ComputeJsNextRequest,
-  res: ComputeJsNextResponse,
+  req: ComputeJsNextRequest | ComputeJsIncomingMessage,
+  res: ComputeJsNextResponse | ComputeJsServerResponse,
   etag: string | undefined
 ): boolean {
   if (etag) {
@@ -101,8 +102,12 @@ export function sendEtagResponse(
 
   if (fresh(req.headers, { etag })) {
     res.statusCode = 304;
-    res.body(null);
-    res.send();
+    if(res instanceof ComputeJsNextResponse) {
+      res.body(null);
+      res.send();
+    } else {
+      res.end();
+    }
     return true;
   }
 

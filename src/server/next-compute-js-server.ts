@@ -34,7 +34,7 @@ import { CacheFs, PageNotFoundError } from 'next/dist/shared/lib/utils';
 
 import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
 import { ComputeJsServerOptions } from './common';
-import { getBackendInfo } from './compute-js';
+import { apiResolver, getBackendInfo } from './compute-js';
 import {
   assetDirectory,
   assetDirectoryExists,
@@ -42,6 +42,7 @@ import {
   getPagePath,
   readAssetFileAsString,
   readAssetManifest,
+  readAssetModule,
   requireFontManifest,
 } from './require';
 import { loadComponents } from './load-components';
@@ -454,6 +455,40 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     builtPagePath: string,
   ): Promise<boolean> {
     console.log({query, params, page, builtPagePath});
+
+    // node's next-server would try to run this first as an edge function.
+    // TODO: do that one day =)
+
+    const pageModule = readAssetModule(
+      this.serverOptions.computeJs.assets,
+      builtPagePath,
+      this.dir
+    );
+
+    query = { ...query, ...params }
+
+    delete query.__nextLocale
+    delete query.__nextDefaultLocale
+
+    // node's next-server would try to run this as a serverless
+    // it's hard to tell at this moment whether that is the right
+    // thing to do.
+
+    await apiResolver(
+      req,
+      res,
+      query,
+      pageModule,
+      {
+        ...this.renderOpts.previewProps,
+        // not implementing revalidate at this moment
+        // internal config so is not typed
+        trustHostHeader: (this.nextConfig.experimental as any).trustHostHeader,
+      },
+      this.minimalMode,
+      this.renderOpts.dev,
+      page
+    );
     return true;
   }
 
