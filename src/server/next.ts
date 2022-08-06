@@ -1,9 +1,10 @@
 import { PHASE_PRODUCTION_SERVER } from 'next/constants';
 
-import { ComputeJsNextRequestPrev, ComputeJsNextResponsePrev } from './base-http/compute-js';
 import { ComputeJsServerOptions } from './common';
 import { loadConfig } from './config';
 import NextComputeJsServer from './next-compute-js-server';
+import { toComputeResponse, toReqRes } from "@fastly/http-compute-js";
+import { ComputeJsNextRequest, ComputeJsNextResponse } from "./base-http/compute-js";
 
 export class NextServer {
   public options: ComputeJsServerOptions;
@@ -39,13 +40,15 @@ export class NextServer {
   }
 
   async handleFetchEvent(event: FetchEvent) {
-    const nextRequest = new ComputeJsNextRequestPrev(event.request, event.client);
-    const nextResponse = new ComputeJsNextResponsePrev();
+    const { req, res } = toReqRes(event.request);
+
+    const nextRequest = new ComputeJsNextRequest(req, event.client);
+    const nextResponse = new ComputeJsNextResponse(res);
 
     const requestHandler = await this.getRequestHandler();
     await requestHandler(nextRequest, nextResponse);
 
-    return await nextResponse.toResponse();
+    return toComputeResponse(res);
   }
 
 }

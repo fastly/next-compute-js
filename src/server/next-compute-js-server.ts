@@ -3,6 +3,7 @@ import { join, relative, resolve } from 'path';
 import type { ParsedUrlQuery } from 'querystring';
 import { UrlWithParsedQuery, format as formatUrl } from 'url';
 
+import compression from 'compression';
 import {
   APP_PATHS_MANIFEST,
   BUILD_ID_FILE,
@@ -24,7 +25,7 @@ import { addRequestMeta, NextParsedUrlQuery } from 'next/dist/server/request-met
 import { RenderOpts, renderToHTML } from 'next/dist/server/render';
 import RenderResult from 'next/dist/server/render-result';
 import { Route } from 'next/dist/server/router';
-import { PayloadOptions } from 'next/dist/server/send-payload';
+import { PayloadOptions, sendRenderResult } from 'next/dist/server/send-payload';
 import { getCustomRoute } from 'next/dist/server/server-route-utils';
 import { normalizePagePath } from 'next/dist/shared/lib/page-path/normalize-page-path';
 import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
@@ -33,9 +34,12 @@ import { getPathMatch } from 'next/dist/shared/lib/router/utils/path-match';
 import { prepareDestination } from 'next/dist/shared/lib/router/utils/prepare-destination';
 import { CacheFs, PageNotFoundError } from 'next/dist/shared/lib/utils';
 
-import { ComputeJsNextRequestPrev, ComputeJsNextResponsePrev } from './base-http/compute-js';
+import {
+  ComputeJsNextRequest,
+  ComputeJsNextResponse,
+} from './base-http/compute-js';
 import { ComputeJsServerOptions } from './common';
-import { apiResolver, getBackendInfo } from './compute-js';
+import { getBackendInfo } from './compute-js';
 import {
   assetDirectory,
   assetDirectoryExists,
@@ -48,7 +52,15 @@ import {
 } from './require';
 import { loadComponents } from './load-components';
 import { serveStatic } from './serve-static';
-import { sendRenderResult } from './send-payload';
+// import { sendRenderResult } from './send-payload';
+import { IncomingMessage, ServerResponse } from "http";
+import { apiResolver, parseBody } from "next/dist/server/api-utils/node";
+
+type ExpressMiddleware = (
+  req: IncomingMessage,
+  res: ServerResponse,
+  next: (err?: Error) => void
+) => void
 
 export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptions> {
   constructor(options: ComputeJsServerOptions) {
@@ -91,6 +103,12 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
       () => {}
     );
   }
+
+    private compression =
+    this.nextConfig.compress && this.nextConfig.target === 'server'
+      ? (compression() as ExpressMiddleware)
+      : undefined
+
 
   protected loadEnvConfig(params: { dev: boolean }): void {
     // NOTE: No ENV in Fastly Compute@Edge, at least for now
@@ -337,8 +355,8 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
   }
 
   protected async sendRenderResult(
-    req: ComputeJsNextRequestPrev,
-    res: ComputeJsNextResponsePrev,
+    req: ComputeJsNextRequest,
+    res: ComputeJsNextResponse,
     options: {
       result: RenderResult;
       type: "html" | "json";
@@ -348,36 +366,38 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     }
   ): Promise<void> {
     return await sendRenderResult({
-      req,
-      res,
+      req: req.originalRequest,
+      res: res.originalResponse,
       ...options,
     });
   }
 
   protected async sendStatic(
-    req: ComputeJsNextRequestPrev,
-    res: ComputeJsNextResponsePrev,
+    req: ComputeJsNextRequest,
+    res: ComputeJsNextResponse,
     path: string,
   ): Promise<void> {
     return serveStatic(
       this.serverOptions.computeJs.assets,
-      req,
-      res,
+      req.originalRequest,
+      res.originalResponse,
       path,
       this.dir,
     );
   }
 
   protected handleCompression(
-    req: ComputeJsNextRequestPrev,
-    res: ComputeJsNextResponsePrev
+    req: ComputeJsNextRequest,
+    res: ComputeJsNextResponse
   ): void {
-    // TODO: Do some compression() -like thing
+    if (this.compression) {
+      this.compression(req.originalRequest, res.originalResponse, () => {})
+    }
   }
 
   protected async proxyRequest(
-    req: BaseNextRequest,
-    res: BaseNextResponse,
+    req: ComputeJsNextRequest,
+    res: ComputeJsNextResponse,
     parsedUrl: ParsedUrl
   ) {
     const { query } = parsedUrl;
@@ -385,12 +405,6 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     parsedUrl.search = stringifyQuery(req, query);
 
     const target = formatUrl(parsedUrl);
-
-    if(!(req instanceof ComputeJsNextRequestPrev) ||
-      !(res instanceof ComputeJsNextResponsePrev)
-    ) {
-      throw new Error('Unexpected');
-    }
 
     const backend = getBackendInfo(this.serverOptions.computeJs.backends, target);
     if(backend == null) {
@@ -404,12 +418,12 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     headers['host'] = new URL(backend.url).host;
 
     // XFF
-    const url = new URL(req.request.url);
+    const url = new URL(req.url);
     const port = url.port || '443';       // C@E can only be on 443, except when running locally
     const proto = 'https';                // C@E can only be accessed via HTTPS
 
     const values: Record<string, string> = {
-      for: req.clientInfo.address,
+      for: req.client.address,
       port,
       proto,
     };
@@ -427,11 +441,13 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
       headers['x-forwarded-' + header] = arr.join(',');
     });
 
+    const body = await parseBody(req.originalRequest, 0);
+
     const response = await fetch(backend.target, {
       backend: backend.name,
-      method: req.request.method,
+      method: req.method,
       headers,
-      body: req.request.body,
+      body: body,
       cacheOverride: new CacheOverride('pass'),
     });
     const buffer = Buffer.from(await response.arrayBuffer());
@@ -439,8 +455,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     response.headers.forEach((value, name) => {
       res.setHeader(name, value);
     });
-    res.body(buffer);
-    res.send();
+    res.originalResponse.end(buffer);
 
     return {
       finished: true,
@@ -448,8 +463,8 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
   }
 
   protected async runApi(
-    req: ComputeJsNextRequestPrev,
-    res: ComputeJsNextResponsePrev,
+    req: ComputeJsNextRequest,
+    res: ComputeJsNextResponse,
     query: ParsedUrlQuery,
     params: Params | undefined,
     page: string,
@@ -476,8 +491,8 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     // thing to do.
 
     await apiResolver(
-      req,
-      res,
+      req.originalRequest,
+      res.originalResponse,
       query,
       pageModule,
       {
@@ -494,28 +509,59 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
   }
 
   protected async renderHTML(
-    req: ComputeJsNextRequestPrev,
-    res: ComputeJsNextResponsePrev,
+    req: ComputeJsNextRequest,
+    res: ComputeJsNextResponse,
     pathname: string,
     query: NextParsedUrlQuery,
     renderOpts: RenderOpts
   ): Promise<RenderResult | null> {
-    // TODO: revisit this
+
+        // Due to the way we pass data by mutating `renderOpts`, we can't extend the
+    // object here but only updating its `serverComponentManifest` field.
+    // https://github.com/vercel/next.js/blob/df7cbd904c3bd85f399d1ce90680c0ecf92d2752/packages/next/server/render.tsx#L947-L952
+    renderOpts.serverComponentManifest = this.serverComponentManifest
+
+    /*
+    if (
+      this.nextConfig.experimental.appDir &&
+      (renderOpts.isAppPath || query.__flight__)
+    ) {
+      const isPagesDir = !renderOpts.isAppPath
+      return appRenderToHTML(
+        req.originalRequest,
+        res.originalResponse,
+        pathname,
+        query,
+        renderOpts,
+        isPagesDir
+      )
+    }
+     */
+
     return renderToHTML(
-      {
-        url: req.url,
-        cookies: req.cookies,
-        headers: req.headers,
-      } as any,
-      {} as any,
+      req.originalRequest,
+      res.originalResponse,
       pathname,
       query,
-      {
-        ...renderOpts,
-        disableOptimizedLoading: true,
-        runtime: 'experimental-edge',
-      }
+      renderOpts
     );
+
+    // // TODO: revisit this
+    // return renderToHTML(
+    //   {
+    //     url: req.url,
+    //     cookies: req.cookies,
+    //     headers: req.headers,
+    //   } as any,
+    //   {} as any,
+    //   pathname,
+    //   query,
+    //   {
+    //     ...renderOpts,
+    //     disableOptimizedLoading: true,
+    //     runtime: 'experimental-edge',
+    //   }
+    // );
   }
 
   public async serveStatic(
@@ -536,8 +582,8 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
 
     try {
       await this.sendStatic(
-        req as ComputeJsNextRequestPrev,
-        res as ComputeJsNextResponsePrev,
+        req as ComputeJsNextRequest,
+        res as ComputeJsNextResponse,
         path
       );
     } catch (error) {
@@ -628,8 +674,8 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
               // TODO: We need an implementation that uses fetch() and can only go to preregistered backends
               // or maybe we can use Dynamic Backends feature once it's available
               return this.proxyRequest(
-                req,
-                res,
+                req as ComputeJsNextRequest,
+                res as ComputeJsNextResponse,
                 parsedDestination
               );
             }

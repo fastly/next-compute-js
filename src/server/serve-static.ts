@@ -1,11 +1,12 @@
-import { ComputeJsNextRequestPrev, ComputeJsNextResponsePrev } from './base-http/compute-js';
+import type { IncomingMessage, ServerResponse } from 'http';
+
 import { Assets } from './common';
 import { getAssetContentType, readAssetFile } from './require';
 
 export async function serveStatic(
   assets: Assets,
-  req: ComputeJsNextRequestPrev,
-  res: ComputeJsNextResponsePrev,
+  req: IncomingMessage,
+  res: ServerResponse,
   path: string,
   dir: string,
 ): Promise<void> {
@@ -18,6 +19,5 @@ export async function serveStatic(
     res.setHeader('Content-Type', contentType);
   }
 
-  res.body(asset);
-  res.send();
+  res.end(asset);
 }
