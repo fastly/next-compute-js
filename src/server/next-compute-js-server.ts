@@ -104,7 +104,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     );
   }
 
-    private compression =
+  private compression =
     this.nextConfig.compress && this.nextConfig.target === 'server'
       ? (compression() as ExpressMiddleware)
       : undefined
