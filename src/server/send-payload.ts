@@ -6,7 +6,7 @@ import { setRevalidateHeaders } from 'next/dist/server/send-payload/revalidate-h
 import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
 
 // Calculate the ETag for a payload.
-export async function generateETag(payload: string) {
+export function generateETag(payload: string) {
   if (payload.length === 0) {
     // fast-path empty
     return '"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"'
@@ -53,7 +53,7 @@ export async function sendRenderResult({
   const payload = result.isDynamic() ? null : result.toUnchunkedString();
 
   if (payload) {
-    const etag = generateEtags ? await generateETag(payload) : undefined;
+    const etag = generateEtags ? generateETag(payload) : undefined;
     if (sendEtagResponse(req, res, etag)) {
       return;
     }
