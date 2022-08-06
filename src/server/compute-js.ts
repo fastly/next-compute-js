@@ -21,6 +21,7 @@ import { interopDefault } from "next/dist/lib/interop-default";
 import {
   ComputeJsIncomingMessage,
   ComputeJsServerResponse,
+  toComputeResponse,
   toReqRes
 } from "@fastly/http-compute-js";
 import { Stream } from "stream";
@@ -418,6 +419,8 @@ export async function apiResolver(
       sendError(apiRes, 500, 'Internal Server Error')
     }
   }
+
+  res.setComputeResponse(toComputeResponse(apiRes));
 }
 
 /**

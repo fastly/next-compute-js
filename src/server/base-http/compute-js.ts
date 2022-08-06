@@ -38,11 +38,16 @@ export class ComputeJsNextResponse extends BaseNextResponse<WritableStream> {
   private _sent = false;
   private emptyBody = false;
 
+  private _overwrittenResponse: Response | undefined = undefined;
+
   private sendPromise = new Promise<void>((resolve) => {
     this.sendResolve = resolve;
   })
   private sendResolve?: () => void;
   private response = this.sendPromise.then(() => {
+    if (this._overwrittenResponse != null) {
+      return this._overwrittenResponse;
+    }
     let body: BodyInit = null;
     if(!this.emptyBody) {
       body = this.bodyContent ?? this.transformStream.readable;
@@ -106,6 +111,11 @@ export class ComputeJsNextResponse extends BaseNextResponse<WritableStream> {
   send() {
     this.sendResolve?.();
     this._sent = true;
+  }
+
+  setComputeResponse(response: Response) {
+    this._overwrittenResponse = response;
+    this.send();
   }
 
   toResponse() {
