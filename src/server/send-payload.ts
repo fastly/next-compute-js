@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import crypto from 'crypto';
 import fresh from 'fresh';
 import RenderResult from 'next/dist/server/render-result';

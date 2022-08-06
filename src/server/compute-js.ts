@@ -1,11 +1,18 @@
 import bytes from 'bytes';
+import { Buffer } from 'buffer';
 import type { Env } from '@next/env';
 import {
   RESPONSE_LIMIT_DEFAULT,
   __ApiPreviewProps,
   getCookieParser,
   redirect,
-  sendStatusCode, clearPreviewData, ApiError, sendError, COOKIE_NAME_PRERENDER_BYPASS, COOKIE_NAME_PRERENDER_DATA,
+  sendStatusCode,
+  clearPreviewData,
+  ApiError,
+  sendError,
+  COOKIE_NAME_PRERENDER_BYPASS,
+  COOKIE_NAME_PRERENDER_DATA,
+  SYMBOL_PREVIEW_DATA, NextApiRequestCookies,
 } from "next/dist/server/api-utils";
 import { Backends } from "./common";
 import { ComputeJsNextRequest, ComputeJsNextResponse } from "./base-http/compute-js";
@@ -16,15 +23,18 @@ import {
   ComputeJsServerResponse,
   toReqRes
 } from "@fastly/http-compute-js";
-import { parseBody, tryGetPreviewData } from "next/dist/server/api-utils/node";
 import { Stream } from "stream";
 import { generateETag, sendEtagResponse } from "./send-payload";
 import { isResSent } from "next/dist/shared/lib/utils";
 import isError from "next/dist/lib/is-error";
-import { encryptWithSecret } from "next/dist/server/crypto-utils";
+import { encryptWithSecret, decryptWithSecret } from "next/dist/server/crypto-utils";
 import jsonwebtoken from 'jsonwebtoken';
 import { CookieSerializeOptions } from "next/dist/server/web/types";
 import { serialize } from 'cookie';
+import { IncomingMessage, ServerResponse } from "http";
+import getRawBody from 'raw-body';
+import { parse } from 'content-type';
+
 export type BackendInfo = {
   name: string,
   url: string,
@@ -206,6 +216,121 @@ class ComputeJsNextApiResponse<T = any> extends ComputeJsServerResponse implemen
 
 }
 
+export function tryGetPreviewData(
+  req: IncomingMessage,
+  res: ServerResponse,
+  options: __ApiPreviewProps
+): PreviewData {
+  // Read cached preview data if present
+  if (SYMBOL_PREVIEW_DATA in req) {
+    return (req as any)[SYMBOL_PREVIEW_DATA] as any
+  }
+
+  const getCookies = getCookieParser(req.headers)
+  let cookies: NextApiRequestCookies
+  try {
+    cookies = getCookies()
+  } catch {
+    // TODO: warn
+    return false
+  }
+
+  const hasBypass = COOKIE_NAME_PRERENDER_BYPASS in cookies
+  const hasData = COOKIE_NAME_PRERENDER_DATA in cookies
+
+  // Case: neither cookie is set.
+  if (!(hasBypass || hasData)) {
+    return false
+  }
+
+  // Case: one cookie is set, but not the other.
+  if (hasBypass !== hasData) {
+    clearPreviewData(res as NextApiResponse)
+    return false
+  }
+
+  // Case: preview session is for an old build.
+  if (cookies[COOKIE_NAME_PRERENDER_BYPASS] !== options.previewModeId) {
+    clearPreviewData(res as NextApiResponse)
+    return false
+  }
+
+  const tokenPreviewData = cookies[COOKIE_NAME_PRERENDER_DATA] as string
+
+  let encryptedPreviewData: {
+    data: string
+  }
+  try {
+    encryptedPreviewData = jsonwebtoken.verify(
+      tokenPreviewData,
+      options.previewModeSigningKey
+    ) as typeof encryptedPreviewData
+  } catch {
+    // TODO: warn
+    clearPreviewData(res as NextApiResponse)
+    return false
+  }
+
+  const decryptedPreviewData = decryptWithSecret(
+    Buffer.from(options.previewModeEncryptionKey),
+    encryptedPreviewData.data
+  )
+
+  try {
+    // TODO: strict runtime type checking
+    const data = JSON.parse(decryptedPreviewData)
+    // Cache lookup
+    Object.defineProperty(req, SYMBOL_PREVIEW_DATA, {
+      value: data,
+      enumerable: false,
+    })
+    return data
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Parse incoming message like `json` or `urlencoded`
+ * @param req request object
+ */
+export async function parseBody(
+  req: IncomingMessage,
+  limit: string | number
+): Promise<any> {
+  let contentType
+  try {
+    contentType = parse(req.headers['content-type'] || 'text/plain')
+  } catch {
+    contentType = parse('text/plain')
+  }
+  const { type, parameters } = contentType
+  const encoding = parameters.charset || 'utf-8'
+
+  let buffer
+
+  try {
+    buffer = await getRawBody(req, { encoding, limit })
+  } catch (e) {
+    if (isError(e) && e.type === 'entity.too.large') {
+      throw new ApiError(413, `Body exceeded ${limit} limit`)
+    } else {
+      throw new ApiError(400, 'Invalid body')
+    }
+  }
+
+  const body = buffer.toString()
+
+  if (type === 'application/json' || type === 'application/ld+json') {
+    return parseJson(body)
+  } else if (type === 'application/x-www-form-urlencoded') {
+    const qs = require('querystring')
+    return qs.decode(body)
+  } else {
+    return body
+  }
+}
+
 type ApiContext = __ApiPreviewProps & {
   trustHostHeader?: boolean
   revalidate?: (_req: ComputeJsNextRequest, _res: ComputeJsNextResponse) => Promise<any>
@@ -292,6 +417,23 @@ export async function apiResolver(
       }
       sendError(apiRes, 500, 'Internal Server Error')
     }
+  }
+}
+
+/**
+ * Parse `JSON` and handles invalid `JSON` strings
+ * @param str `JSON` string
+ */
+function parseJson(str: string): object {
+  if (str.length === 0) {
+    // special-case empty json body, as it's a common client-side mistake
+    return {}
+  }
+
+  try {
+    return JSON.parse(str)
+  } catch (e) {
+    throw new ApiError(400, 'Invalid JSON')
   }
 }
 

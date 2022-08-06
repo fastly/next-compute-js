@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import { join, relative, resolve } from 'path';
 import type { ParsedUrlQuery } from 'querystring';
 import { UrlWithParsedQuery, format as formatUrl } from 'url';

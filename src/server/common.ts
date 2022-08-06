@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import { Options } from "next/dist/server/base-server";
 
 export interface ComputeJsAsset {
