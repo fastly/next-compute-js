@@ -1,5 +1,6 @@
 import { Buffer } from 'buffer';
 import type { IncomingHttpHeaders } from 'http';
+
 import { BaseNextRequest, BaseNextResponse } from 'next/dist/server/base-http';
 
 export class ComputeJsNextRequest extends BaseNextRequest<ReadableStream | null> {

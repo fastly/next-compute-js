@@ -1,4 +1,5 @@
 import { join, relative } from 'path';
+
 import { PagesManifest } from 'next/dist/build/webpack/plugins/pages-manifest-plugin';
 import { normalizeLocalePath } from 'next/dist/shared/lib/i18n/normalize-locale-path';
 import { denormalizePagePath } from 'next/dist/shared/lib/page-path/denormalize-page-path';
@@ -11,6 +12,7 @@ import {
   SERVER_DIRECTORY,
   SERVERLESS_DIRECTORY
 } from 'next/constants';
+
 import { Assets } from './common';
 
 export function getPagePath(

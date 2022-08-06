@@ -1,5 +1,6 @@
 import { Buffer } from 'buffer';
-import { Options } from "next/dist/server/base-server";
+
+import { Options } from 'next/dist/server/base-server';
 
 export interface ComputeJsAsset {
   contentType: string;

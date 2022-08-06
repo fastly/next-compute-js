@@ -1,11 +1,13 @@
 import { Buffer } from 'buffer';
 import crypto from 'crypto';
+
+import { ComputeJsIncomingMessage, ComputeJsServerResponse } from '@fastly/http-compute-js';
 import fresh from 'fresh';
 import RenderResult from 'next/dist/server/render-result';
 import type { PayloadOptions } from 'next/dist/server/send-payload';
 import { setRevalidateHeaders } from 'next/dist/server/send-payload/revalidate-headers';
+
 import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
-import { ComputeJsIncomingMessage, ComputeJsServerResponse } from "@fastly/http-compute-js";
 
 // Calculate the ETag for a payload.
 export function generateETag(payload: string) {

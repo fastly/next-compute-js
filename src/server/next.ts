@@ -1,8 +1,9 @@
-import { ComputeJsServerOptions } from "./common";
-import { loadConfig } from "./config";
-import { PHASE_PRODUCTION_SERVER } from "next/constants";
-import NextComputeJsServer from "./next-compute-js-server";
-import { ComputeJsNextRequest, ComputeJsNextResponse } from "./base-http/compute-js";
+import { PHASE_PRODUCTION_SERVER } from 'next/constants';
+
+import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
+import { ComputeJsServerOptions } from './common';
+import { loadConfig } from './config';
+import NextComputeJsServer from './next-compute-js-server';
 
 export class NextServer {
   public options: ComputeJsServerOptions;

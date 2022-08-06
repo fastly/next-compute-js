@@ -1,11 +1,13 @@
+import { basename, extname, isAbsolute, relative, resolve } from 'path';
+
 import chalk from 'chalk'
+import { CONFIG_FILES } from 'next/constants';
 import * as Log from 'next/dist/build/output/log'
 import { defaultConfig, ExperimentalConfig, NextConfigComplete, normalizeConfig } from 'next/dist/server/config-shared';
 import { execOnce } from 'next/dist/shared/lib/utils';
-import { ImageConfig, imageConfigDefault, VALID_LOADERS } from "next/dist/shared/lib/image-config";
-import { basename, extname, isAbsolute, relative, resolve } from "path";
-import { Assets } from "./common";
-import { CONFIG_FILES } from "next/constants";
+import { ImageConfig, imageConfigDefault, VALID_LOADERS } from 'next/dist/shared/lib/image-config';
+
+import { Assets } from './common';
 
 const targets = [ 'server' /*, 'serverless', 'experimental-serverless-trace'*/];
 

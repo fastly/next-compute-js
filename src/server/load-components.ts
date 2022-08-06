@@ -1,11 +1,12 @@
 import { join } from 'path';
 
-import { LoadComponentsReturnType } from "next/dist/server/load-components";
-import { Assets } from "./common";
-import { getPagePath, readAssetManifest, requirePage } from "./require";
-import { BUILD_MANIFEST, FLIGHT_MANIFEST, NEXT_CLIENT_SSR_ENTRY_SUFFIX, REACT_LOADABLE_MANIFEST } from "next/constants";
-import { normalizePagePath } from "next/dist/shared/lib/page-path/normalize-page-path";
-import { interopDefault } from "next/dist/lib/interop-default";
+import { BUILD_MANIFEST, FLIGHT_MANIFEST, NEXT_CLIENT_SSR_ENTRY_SUFFIX, REACT_LOADABLE_MANIFEST } from 'next/constants';
+import { interopDefault } from 'next/dist/lib/interop-default';
+import { LoadComponentsReturnType } from 'next/dist/server/load-components';
+import { normalizePagePath } from 'next/dist/shared/lib/page-path/normalize-page-path';
+
+import { Assets } from './common';
+import { getPagePath, readAssetManifest, requirePage } from './require';
 
 export async function loadComponents(
   assets: Assets,

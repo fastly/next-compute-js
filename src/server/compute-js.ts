@@ -1,6 +1,21 @@
-import bytes from 'bytes';
 import { Buffer } from 'buffer';
+import { IncomingMessage, ServerResponse } from 'http';
+import { Stream } from 'stream';
+
+import {
+  ComputeJsIncomingMessage,
+  ComputeJsServerResponse,
+  toComputeResponse,
+  toReqRes
+} from "@fastly/http-compute-js";
 import type { Env } from '@next/env';
+import bytes from 'bytes';
+import { parse } from 'content-type';
+import { serialize } from 'cookie';
+import jsonwebtoken from 'jsonwebtoken';
+import { NextApiRequest, NextApiResponse, PageConfig, PreviewData } from 'next';
+import { interopDefault } from 'next/dist/lib/interop-default';
+import isError from 'next/dist/lib/is-error';
 import {
   RESPONSE_LIMIT_DEFAULT,
   __ApiPreviewProps,
@@ -12,29 +27,17 @@ import {
   sendError,
   COOKIE_NAME_PRERENDER_BYPASS,
   COOKIE_NAME_PRERENDER_DATA,
-  SYMBOL_PREVIEW_DATA, NextApiRequestCookies,
-} from "next/dist/server/api-utils";
-import { Backends } from "./common";
-import { ComputeJsNextRequest, ComputeJsNextResponse } from "./base-http/compute-js";
-import { NextApiRequest, NextApiResponse, PageConfig, PreviewData } from "next";
-import { interopDefault } from "next/dist/lib/interop-default";
-import {
-  ComputeJsIncomingMessage,
-  ComputeJsServerResponse,
-  toComputeResponse,
-  toReqRes
-} from "@fastly/http-compute-js";
-import { Stream } from "stream";
-import { generateETag, sendEtagResponse } from "./send-payload";
-import { isResSent } from "next/dist/shared/lib/utils";
-import isError from "next/dist/lib/is-error";
-import { encryptWithSecret, decryptWithSecret } from "next/dist/server/crypto-utils";
-import jsonwebtoken from 'jsonwebtoken';
-import { CookieSerializeOptions } from "next/dist/server/web/types";
-import { serialize } from 'cookie';
-import { IncomingMessage, ServerResponse } from "http";
+  SYMBOL_PREVIEW_DATA,
+  NextApiRequestCookies,
+} from 'next/dist/server/api-utils';
+import { encryptWithSecret, decryptWithSecret } from 'next/dist/server/crypto-utils';
+import { CookieSerializeOptions } from 'next/dist/server/web/types';
+import { isResSent } from 'next/dist/shared/lib/utils';
 import getRawBody from 'raw-body';
-import { parse } from 'content-type';
+
+import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
+import { Backends } from './common';
+import { generateETag, sendEtagResponse } from './send-payload';
 
 export type BackendInfo = {
   name: string,
@@ -361,7 +364,7 @@ export async function apiResolver(
       res.statusCode = 404;
       res.body('Not Found');
       res.send();
-      return
+      return;
     }
     const config: PageConfig = resolverModule.config || {}
     const bodyParser = config.api?.bodyParser !== false
@@ -403,18 +406,18 @@ export async function apiResolver(
     }
   } catch (err) {
     if (err instanceof ApiError) {
-      sendError(apiRes, err.statusCode, err.message)
+      sendError(apiRes, err.statusCode, err.message);
     } else {
       if (dev) {
         if (isError(err)) {
-          err.page = page
+          err.page = page;
         }
-        throw err
+        throw err;
       }
 
-      console.error(err)
+      console.error(err);
       if (propagateError) {
-        throw err
+        throw err;
       }
       sendError(apiRes, 500, 'Internal Server Error')
     }
