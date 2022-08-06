@@ -1,6 +1,6 @@
-import path from "path";
-import fs from "fs";
-import child_process from "child_process";
+import child_process from 'child_process';
+import fs from 'fs';
+import path from 'path';
 
 const COMPUTE_JS_DIR = './compute-js';
 

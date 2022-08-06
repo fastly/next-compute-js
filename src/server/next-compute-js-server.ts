@@ -3,7 +3,7 @@ import { join, relative, resolve } from 'path';
 import type { ParsedUrlQuery } from 'querystring';
 import { UrlWithParsedQuery, format as formatUrl } from 'url';
 
-import compression from 'compression';
+// import compression from 'compression';
 import {
   APP_PATHS_MANIFEST,
   BUILD_ID_FILE,
@@ -52,15 +52,14 @@ import {
 } from './require';
 import { loadComponents } from './load-components';
 import { serveStatic } from './serve-static';
-// import { sendRenderResult } from './send-payload';
-import { IncomingMessage, ServerResponse } from "http";
+// import { IncomingMessage, ServerResponse } from "http";
 import { apiResolver, parseBody } from "next/dist/server/api-utils/node";
 
-type ExpressMiddleware = (
-  req: IncomingMessage,
-  res: ServerResponse,
-  next: (err?: Error) => void
-) => void
+// type ExpressMiddleware = (
+//   req: IncomingMessage,
+//   res: ServerResponse,
+//   next: (err?: Error) => void
+// ) => void
 
 export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptions> {
   constructor(options: ComputeJsServerOptions) {
@@ -104,11 +103,11 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     );
   }
 
-  private compression =
-    this.nextConfig.compress && this.nextConfig.target === 'server'
-      ? (compression() as ExpressMiddleware)
-      : undefined
-
+  // TODO: find out why this is broken
+  // private compression =
+  //   this.nextConfig.compress && this.nextConfig.target === 'server'
+  //     ? (compression() as ExpressMiddleware)
+  //     : undefined
 
   protected loadEnvConfig(params: { dev: boolean }): void {
     // NOTE: No ENV in Fastly Compute@Edge, at least for now
@@ -390,9 +389,11 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     req: ComputeJsNextRequest,
     res: ComputeJsNextResponse
   ): void {
-    if (this.compression) {
-      this.compression(req.originalRequest, res.originalResponse, () => {})
-    }
+    // TODO: Not sure why this is broken at the moment
+    return;
+    // if (this.compression) {
+    //   this.compression(req.originalRequest, res.originalResponse, () => {})
+    // }
   }
 
   protected async proxyRequest(
@@ -516,7 +517,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     renderOpts: RenderOpts
   ): Promise<RenderResult | null> {
 
-        // Due to the way we pass data by mutating `renderOpts`, we can't extend the
+    // Due to the way we pass data by mutating `renderOpts`, we can't extend the
     // object here but only updating its `serverComponentManifest` field.
     // https://github.com/vercel/next.js/blob/df7cbd904c3bd85f399d1ce90680c0ecf92d2752/packages/next/server/render.tsx#L947-L952
     renderOpts.serverComponentManifest = this.serverComponentManifest
@@ -545,23 +546,6 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
       query,
       renderOpts
     );
-
-    // // TODO: revisit this
-    // return renderToHTML(
-    //   {
-    //     url: req.url,
-    //     cookies: req.cookies,
-    //     headers: req.headers,
-    //   } as any,
-    //   {} as any,
-    //   pathname,
-    //   query,
-    //   {
-    //     ...renderOpts,
-    //     disableOptimizedLoading: true,
-    //     runtime: 'experimental-edge',
-    //   }
-    // );
   }
 
   public async serveStatic(

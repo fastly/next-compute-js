@@ -3,7 +3,8 @@ import chalk from 'chalk';
 
 import isError from 'next/dist/lib/is-error';
 import { printAndExit } from 'next/dist/server/lib/utils';
-import { generateServerProject } from "../../init-server/generate";
+
+import { generateServerProject } from '../../init-server/generate';
 
 export function init(argv: string[] | undefined) {
   const validArgs: arg.Spec = {
