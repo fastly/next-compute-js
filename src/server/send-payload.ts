@@ -1,5 +1,5 @@
-// import { Buffer } from 'buffer';
-// import crypto from 'crypto';
+import { Buffer } from 'buffer';
+import crypto from 'crypto';
 //
 // import { ComputeJsIncomingMessage, ComputeJsServerResponse } from '@fastly/http-compute-js';
 // import fresh from 'fresh';
@@ -9,25 +9,26 @@
 //
 // import { ComputeJsNextRequestPrev, ComputeJsNextResponsePrev } from './base-http/compute-js';
 //
-// // Calculate the ETag for a payload.
-// export function generateETag(payload: string) {
-//   if (payload.length === 0) {
-//     // fast-path empty
-//     return '"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"'
-//   }
-//
-//   // compute hash of entity
-//   const hash = crypto
-//     .createHash('sha1')
-//     .update(payload, 'utf8')
-//     .digest('base64')
-//     .substring(0, 27)
-//
-//   // compute length of entity
-//   const len = Buffer.byteLength(payload)
-//
-//   return '"' + len.toString(16) + '-' + hash + '"'
-// }
+// Calculate the ETag for a payload.
+export function generateETag(payload: string) {
+  if (payload.length === 0) {
+    // fast-path empty
+    return '"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"';
+  }
+
+  // compute hash of entity
+  const hash = crypto
+    .createHash('sha1')
+    .update(payload, 'utf8')
+    .digest('base64')
+    .substring(0, 27);
+
+  // compute length of entity
+  const len: number = Buffer.byteLength(payload);
+
+  return '"' + len.toString(16) + '-' + hash + '"';
+}
+
 //
 // export async function sendRenderResult({
 //   req,
