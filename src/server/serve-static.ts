@@ -1,11 +1,11 @@
-import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
+import { ComputeJsNextRequestPrev, ComputeJsNextResponsePrev } from './base-http/compute-js';
 import { Assets } from './common';
 import { getAssetContentType, readAssetFile } from './require';
 
 export async function serveStatic(
   assets: Assets,
-  req: ComputeJsNextRequest,
-  res: ComputeJsNextResponse,
+  req: ComputeJsNextRequestPrev,
+  res: ComputeJsNextResponsePrev,
   path: string,
   dir: string,
 ): Promise<void> {

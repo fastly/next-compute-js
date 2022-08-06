@@ -33,7 +33,7 @@ import { getPathMatch } from 'next/dist/shared/lib/router/utils/path-match';
 import { prepareDestination } from 'next/dist/shared/lib/router/utils/prepare-destination';
 import { CacheFs, PageNotFoundError } from 'next/dist/shared/lib/utils';
 
-import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
+import { ComputeJsNextRequestPrev, ComputeJsNextResponsePrev } from './base-http/compute-js';
 import { ComputeJsServerOptions } from './common';
 import { apiResolver, getBackendInfo } from './compute-js';
 import {
@@ -337,8 +337,8 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
   }
 
   protected async sendRenderResult(
-    req: ComputeJsNextRequest,
-    res: ComputeJsNextResponse,
+    req: ComputeJsNextRequestPrev,
+    res: ComputeJsNextResponsePrev,
     options: {
       result: RenderResult;
       type: "html" | "json";
@@ -355,8 +355,8 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
   }
 
   protected async sendStatic(
-    req: ComputeJsNextRequest,
-    res: ComputeJsNextResponse,
+    req: ComputeJsNextRequestPrev,
+    res: ComputeJsNextResponsePrev,
     path: string,
   ): Promise<void> {
     return serveStatic(
@@ -369,8 +369,8 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
   }
 
   protected handleCompression(
-    req: ComputeJsNextRequest,
-    res: ComputeJsNextResponse
+    req: ComputeJsNextRequestPrev,
+    res: ComputeJsNextResponsePrev
   ): void {
     // TODO: Do some compression() -like thing
   }
@@ -386,8 +386,8 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
 
     const target = formatUrl(parsedUrl);
 
-    if(!(req instanceof ComputeJsNextRequest) ||
-      !(res instanceof ComputeJsNextResponse)
+    if(!(req instanceof ComputeJsNextRequestPrev) ||
+      !(res instanceof ComputeJsNextResponsePrev)
     ) {
       throw new Error('Unexpected');
     }
@@ -448,8 +448,8 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
   }
 
   protected async runApi(
-    req: ComputeJsNextRequest,
-    res: ComputeJsNextResponse,
+    req: ComputeJsNextRequestPrev,
+    res: ComputeJsNextResponsePrev,
     query: ParsedUrlQuery,
     params: Params | undefined,
     page: string,
@@ -494,8 +494,8 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
   }
 
   protected async renderHTML(
-    req: ComputeJsNextRequest,
-    res: ComputeJsNextResponse,
+    req: ComputeJsNextRequestPrev,
+    res: ComputeJsNextResponsePrev,
     pathname: string,
     query: NextParsedUrlQuery,
     renderOpts: RenderOpts
@@ -536,8 +536,8 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
 
     try {
       await this.sendStatic(
-        req as ComputeJsNextRequest,
-        res as ComputeJsNextResponse,
+        req as ComputeJsNextRequestPrev,
+        res as ComputeJsNextResponsePrev,
         path
       );
     } catch (error) {

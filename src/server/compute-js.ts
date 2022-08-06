@@ -35,7 +35,7 @@ import { CookieSerializeOptions } from 'next/dist/server/web/types';
 import { isResSent } from 'next/dist/shared/lib/utils';
 import getRawBody from 'raw-body';
 
-import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
+import { ComputeJsNextRequestPrev, ComputeJsNextResponsePrev } from './base-http/compute-js';
 import { Backends } from './common';
 import { generateETag, sendEtagResponse } from './send-payload';
 
@@ -337,12 +337,12 @@ export async function parseBody(
 
 type ApiContext = __ApiPreviewProps & {
   trustHostHeader?: boolean
-  revalidate?: (_req: ComputeJsNextRequest, _res: ComputeJsNextResponse) => Promise<any>
+  revalidate?: (_req: ComputeJsNextRequestPrev, _res: ComputeJsNextResponsePrev) => Promise<any>
 }
 
 export async function apiResolver(
-  req: ComputeJsNextRequest,
-  res: ComputeJsNextResponse,
+  req: ComputeJsNextRequestPrev,
+  res: ComputeJsNextResponsePrev,
   query: any,
   resolverModule: any,
   apiContext: ApiContext,

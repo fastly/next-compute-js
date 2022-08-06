@@ -7,7 +7,7 @@ import RenderResult from 'next/dist/server/render-result';
 import type { PayloadOptions } from 'next/dist/server/send-payload';
 import { setRevalidateHeaders } from 'next/dist/server/send-payload/revalidate-headers';
 
-import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
+import { ComputeJsNextRequestPrev, ComputeJsNextResponsePrev } from './base-http/compute-js';
 
 // Calculate the ETag for a payload.
 export function generateETag(payload: string) {
@@ -38,8 +38,8 @@ export async function sendRenderResult({
   poweredByHeader,
   options,
 }: {
-  req: ComputeJsNextRequest
-  res: ComputeJsNextResponse
+  req: ComputeJsNextRequestPrev
+  res: ComputeJsNextResponsePrev
   result: RenderResult
   type: 'html' | 'json'
   generateEtags: boolean
@@ -89,8 +89,8 @@ export async function sendRenderResult({
 }
 
 export function sendEtagResponse(
-  req: ComputeJsNextRequest | ComputeJsIncomingMessage,
-  res: ComputeJsNextResponse | ComputeJsServerResponse,
+  req: ComputeJsNextRequestPrev | ComputeJsIncomingMessage,
+  res: ComputeJsNextResponsePrev | ComputeJsServerResponse,
   etag: string | undefined
 ): boolean {
   if (etag) {
@@ -105,7 +105,7 @@ export function sendEtagResponse(
 
   if (fresh(req.headers, { etag })) {
     res.statusCode = 304;
-    if(res instanceof ComputeJsNextResponse) {
+    if(res instanceof ComputeJsNextResponsePrev) {
       res.body(null);
       res.send();
     } else {
@@ -119,7 +119,7 @@ export function sendEtagResponse(
 
 export async function pipeRenderResult(
   result: RenderResult,
-  res: ComputeJsNextResponse,
+  res: ComputeJsNextResponsePrev,
 ) {
   if (typeof result._result === 'string') {
     throw new Error(

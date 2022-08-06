@@ -3,7 +3,7 @@ import type { IncomingHttpHeaders } from 'http';
 
 import { BaseNextRequest, BaseNextResponse } from 'next/dist/server/base-http';
 
-export class ComputeJsNextRequest extends BaseNextRequest<ReadableStream | null> {
+export class ComputeJsNextRequestPrev extends BaseNextRequest<ReadableStream | null> {
   public request: Request;
   public clientInfo: ClientInfo;
   public headers: IncomingHttpHeaders;
@@ -33,7 +33,7 @@ export class ComputeJsNextRequest extends BaseNextRequest<ReadableStream | null>
   }
 }
 
-export class ComputeJsNextResponse extends BaseNextResponse<WritableStream> {
+export class ComputeJsNextResponsePrev extends BaseNextResponse<WritableStream> {
   private headers = new Headers();
   private bodyContent: string | Buffer | undefined = undefined;
   private _sent = false;

@@ -1,6 +1,6 @@
 import { PHASE_PRODUCTION_SERVER } from 'next/constants';
 
-import { ComputeJsNextRequest, ComputeJsNextResponse } from './base-http/compute-js';
+import { ComputeJsNextRequestPrev, ComputeJsNextResponsePrev } from './base-http/compute-js';
 import { ComputeJsServerOptions } from './common';
 import { loadConfig } from './config';
 import NextComputeJsServer from './next-compute-js-server';
@@ -39,8 +39,8 @@ export class NextServer {
   }
 
   async handleFetchEvent(event: FetchEvent) {
-    const nextRequest = new ComputeJsNextRequest(event.request, event.client);
-    const nextResponse = new ComputeJsNextResponse();
+    const nextRequest = new ComputeJsNextRequestPrev(event.request, event.client);
+    const nextResponse = new ComputeJsNextResponsePrev();
 
     const requestHandler = await this.getRequestHandler();
     await requestHandler(nextRequest, nextResponse);
