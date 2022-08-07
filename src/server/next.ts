@@ -48,7 +48,7 @@ export class NextServer {
     const requestHandler = await this.getRequestHandler();
     await requestHandler(nextRequest, nextResponse);
 
-    return toComputeResponse(res);
+    return await toComputeResponse(res);
   }
 
 }
