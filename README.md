@@ -99,6 +99,7 @@ The following Next.js features are supported:
 * Client-Side fetching
 * SWR
 * Built-in CSS / CSS Modules
+* Compression (gzip)
 * ETag generation
 * Rewrites
 * Redirects
@@ -110,10 +111,10 @@ The following Next.js features are supported:
 * Custom App
 * Custom Document
 * Custom Error Page
+* API Routes / Middleware
 
 The following features are not yet supported, but are on the radar:
 
-* API Routes / API Middleware
 * Image Optimization
 * Preview Mode
 * React 18 support
