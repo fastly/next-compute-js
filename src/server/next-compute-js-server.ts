@@ -1,9 +1,10 @@
 import { Buffer } from 'buffer';
+import type { IncomingMessage, ServerResponse } from 'http';
 import { join, relative, resolve } from 'path';
 import type { ParsedUrlQuery } from 'querystring';
 import { UrlWithParsedQuery, format as formatUrl } from 'url';
 
-// import compression from 'compression';
+import compression from 'compression';
 import {
   APP_PATHS_MANIFEST,
   BUILD_ID_FILE,
@@ -18,6 +19,7 @@ import { PrerenderManifest } from 'next/dist/build';
 import { PagesManifest } from 'next/dist/build/webpack/plugins/pages-manifest-plugin';
 import isError from 'next/dist/lib/is-error';
 import { CustomRoutes, Rewrite } from 'next/dist/lib/load-custom-routes';
+import { apiResolver, parseBody } from 'next/dist/server/api-utils/node';
 import { BaseNextRequest, BaseNextResponse } from 'next/dist/server/base-http';
 import BaseServer, { stringifyQuery } from 'next/dist/server/base-server';
 import { FontManifest } from 'next/dist/server/font-utils';
@@ -52,14 +54,12 @@ import {
 } from './require';
 import { loadComponents } from './load-components';
 import { serveStatic } from './serve-static';
-// import { IncomingMessage, ServerResponse } from "http";
-import { apiResolver, parseBody } from "next/dist/server/api-utils/node";
 
-// type ExpressMiddleware = (
-//   req: IncomingMessage,
-//   res: ServerResponse,
-//   next: (err?: Error) => void
-// ) => void
+type ExpressMiddleware = (
+  req: IncomingMessage,
+  res: ServerResponse,
+  next: (err?: Error) => void
+) => void
 
 export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptions> {
   constructor(options: ComputeJsServerOptions) {
@@ -104,10 +104,10 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
   }
 
   // TODO: find out why this is broken
-  // private compression =
-  //   this.nextConfig.compress && this.nextConfig.target === 'server'
-  //     ? (compression() as ExpressMiddleware)
-  //     : undefined
+  private compression =
+    this.nextConfig.compress && this.nextConfig.target === 'server'
+      ? (compression() as ExpressMiddleware)
+      : undefined
 
   protected loadEnvConfig(params: { dev: boolean }): void {
     // NOTE: No ENV in Fastly Compute@Edge, at least for now
@@ -390,10 +390,9 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     res: ComputeJsNextResponse
   ): void {
     // TODO: Not sure why this is broken at the moment
-    return;
-    // if (this.compression) {
-    //   this.compression(req.originalRequest, res.originalResponse, () => {})
-    // }
+    if (this.compression) {
+      this.compression(req.originalRequest, res.originalResponse, () => {})
+    }
   }
 
   protected async proxyRequest(
