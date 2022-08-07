@@ -9,11 +9,14 @@
         "prebuild": "npx @fastly/compute-js-static-publish --build-static && webpack"
     },
     "dependencies": {
-        "@fastly/js-compute": "^0.3.0"
+        "@fastly/js-compute": "^0.3.0",
+        "util": "^0.12.4"
     },
     "devDependencies": {
-        "@fastly/compute-js-static-publish": "^2.0.0-alpha.1",
-        "@fastly/next-compute-js": "^0.1.0-alpha.23",
+        "@fastly/compute-js-static-publish": "^2.0.0-alpha.2",
+        "@fastly/next-compute-js": "^0.1.1-alpha.5",
+        "assert": "^2.0.0",
+        "browserify-zlib": "^0.2.0",
         "buffer": "^6.0.3",
         "core-js": "^3.19.1",
         "crypto-browserify": "^3.12.0",

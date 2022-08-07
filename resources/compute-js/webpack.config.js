@@ -52,21 +52,24 @@ module.exports = {
     // Used for, e.g., any cross-platform WHATWG,
     // or core nodejs modules needed for your application.
     new webpack.ProvidePlugin({
-      Buffer: [ "buffer", "Buffer" ],
+      Buffer: [ 'buffer', 'Buffer' ],
       process: 'process',
-      setTimeout: [ 'local-polyfill', 'setTimeout' ],
+      setTimeout: [ 'timeout-polyfill', 'setTimeout' ],
+      clearTimeout: [ 'timeout-polyfill', 'clearTimeout' ],
     }),
     new webpack.EnvironmentPlugin({
       NEXT_RUNTIME: 'edge',
-      NEXT_PRIVATE_MINIMAL_MODE: false,
-      NEXT_COMPUTE_JS: true
+      NEXT_COMPUTE_JS: true,
     }),
   ],
   resolve: {
     alias: {
-      'local-polyfill': path.resolve(__dirname, "./src/polyfill"),
+      'timeout-polyfill': require.resolve('@fastly/http-compute-js/dist/polyfill'),
+      'next/dist/compiled/etag': require.resolve('@fastly/next-compute-js/build/src/util/etag'),
+      'next/dist/compiled/raw-body': require.resolve('raw-body'),
     },
     fallback: {
+      "async_hooks": false,
       "buffer": require.resolve("buffer/"),
       "crypto": require.resolve("crypto-browserify/"),
       "os": require.resolve("os-browserify/browser"),
@@ -75,6 +78,8 @@ module.exports = {
       "querystring": require.resolve("querystring-es3"),
       "stream": require.resolve("stream-browserify"),
       "url": require.resolve("url/"),
+      "util": require.resolve("util/"),
+      "zlib": require.resolve("browserify-zlib"),
     }
   },
 };

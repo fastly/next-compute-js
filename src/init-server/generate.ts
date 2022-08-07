@@ -42,7 +42,6 @@ export function generateServerProject() {
   // Copy resource files
   const files = [
     'src/index.js',
-    'src/polyfill.js',
     ['_gitignore', '.gitignore'],
     '.nvmrc',
     '.npmrc',
