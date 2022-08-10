@@ -43,7 +43,7 @@ npx @fastly/next-compute-js init
 This will generate a Compute@Edge project for you and place it in a `./compute-js` directory.
 
 This program can then be [served (local development server)](https://developer.fastly.com/learning/compute/testing/#running-a-local-testing-server)
-or [published (to compute@edge service)](https://developer.fastly.com/reference/cli/compute/publish/) by using the following commands.
+or [published (to compute@edge service)](https://developer.fastly.com/learning/compute/#deploy-the-project-to-a-new-fastly-service) by using the following commands.
 
 Local Development:
 ```shell
