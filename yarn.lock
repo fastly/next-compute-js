@@ -183,10 +183,10 @@
     "@babel/helper-validator-identifier" "^7.18.6"
     to-fast-properties "^2.0.0"
 
-"@fastly/http-compute-js@^0.1.0-beta.1":
-  version "0.1.0-beta.1"
-  resolved "https://registry.yarnpkg.com/@fastly/http-compute-js/-/http-compute-js-0.1.0-beta.1.tgz#b87500fb2e1d4cdb2d3875aabb6dafb71efd775a"
-  integrity sha512-4xBMgZqlXWfdXbLjwtRoImtaJ8qQlAP8WSOpTxEOF8wP0SzQtv5Gh0JdDVDsiGMPsxfQqIfSjN5V55m29Umczw==
+"@fastly/http-compute-js@^0.1.0-beta.2":
+  version "0.1.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@fastly/http-compute-js/-/http-compute-js-0.1.0-beta.2.tgz#14e006a74c1d24f318b75d1d74a394ee5f8c4f22"
+  integrity sha512-MfWMA2ouDz2FH/PTRQRuLKHu81ApspppZgsHA8Ar59/uZrA47aAB24Hb0PXWZySBKm22FNE27EARp+0QCJuB0w==
   dependencies:
     buffer "^6.0.3"
     node-inspect-extracted "^1.1.0"
