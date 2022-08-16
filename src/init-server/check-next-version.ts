@@ -6,7 +6,7 @@ const { sync } = require('pkg-up');
 
 const versionMatrix: Map<string, string> = new Map<string, string>([
   ['12.2.2', '0.1.1-beta.4'],
-  ['12.2.4', '0.2.0'],
+  ['12.2.4', '0.2.1'],
 ]);
 
 const newestNextjsVersion = [...versionMatrix.keys()].pop();
