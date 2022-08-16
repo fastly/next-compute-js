@@ -6,7 +6,8 @@
   "main": "./build/src/index.js",
   "types": "./build/src/index.d.ts",
   "bin": {
-    "next-compute-js": "./build/src/bin/next-compute-js.js"
+    "next-compute-js": "./build/src/bin/next-compute-js.js",
+    "check-next-version": "./build/src/bin/check-next-version.js"
   },
   "scripts": {
     "prepack": "yarn clean && yarn test && yarn compile",
@@ -15,7 +16,7 @@
     "test": "nyc ts-mocha -p tsconfig.json --require test/mocha_bootstrap.js test/testHelpers.ts test/**/*.test.ts"
   },
   "peerDependencies": {
-    "next": "12.2.4",
+    "next": "^12.2.4",
     "react": "^17.0.2 || ^18.0.0-0",
     "react-dom": "^17.0.2 || ^18.0.0-0"
   },
@@ -25,6 +26,7 @@
     "chalk": "^4.1.2",
     "compression": "^1.7.4",
     "node-inspect-extracted": "^1.1.0",
+    "pkg-up": "^3.1.0",
     "raw-body": "^2.5.1"
   },
   "devDependencies": {
