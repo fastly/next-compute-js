@@ -10,7 +10,13 @@ import { basename, extname, isAbsolute, relative, resolve } from 'path';
 import chalk from 'chalk';
 import { CONFIG_FILES } from 'next/constants';
 import * as Log from 'next/dist/build/output/log';
-import { defaultConfig, ExperimentalConfig, NextConfigComplete, normalizeConfig } from 'next/dist/server/config-shared';
+import {
+  defaultConfig,
+  ExperimentalConfig,
+  NextConfigComplete,
+  normalizeConfig,
+  validateConfig
+} from 'next/dist/server/config-shared';
 import { execOnce } from 'next/dist/shared/lib/utils';
 import { ImageConfig, imageConfigDefault, VALID_LOADERS } from 'next/dist/shared/lib/image-config';
 
@@ -39,23 +45,6 @@ const experimentalWarning = execOnce(
   }
 )
 
-const missingExperimentalWarning = execOnce(
-  (configFileName: string, features: string[]) => {
-    const s = features.length > 1 ? 's' : ''
-    const dont = features.length > 1 ? 'do not' : 'does not'
-    const them = features.length > 1 ? 'them' : 'it'
-    Log.warn(
-      chalk.bold(
-        `You have defined experimental feature${s} (${features.join(
-          ', '
-        )}) in ${configFileName} that ${dont} exist in this version of Next.js.`
-      )
-    )
-    Log.warn(`Please remove ${them} from your configuration.`)
-    console.warn()
-  }
-)
-
 function assignDefaults(userConfig: { [key: string]: any }) {
   const configFileName = userConfig.configFileName
   if (typeof userConfig.exportTrailingSlash !== 'undefined') {
@@ -78,7 +67,6 @@ function assignDefaults(userConfig: { [key: string]: any }) {
       }
 
       if (key === 'experimental' && typeof value === 'object') {
-        const enabledMissingExperiments: string[] = []
         const enabledExperiments: (keyof ExperimentalConfig)[] = []
 
         // defaultConfig.experimental is predefined and will never be undefined
@@ -87,9 +75,7 @@ function assignDefaults(userConfig: { [key: string]: any }) {
           for (const featureName of Object.keys(
             value
           ) as (keyof ExperimentalConfig)[]) {
-            if (!(featureName in defaultConfig.experimental)) {
-              enabledMissingExperiments.push(featureName)
-            } else if (
+            if (
               value[featureName] !== defaultConfig.experimental[featureName]
             ) {
               enabledExperiments.push(featureName)
@@ -97,9 +83,6 @@ function assignDefaults(userConfig: { [key: string]: any }) {
           }
         }
 
-        if (enabledMissingExperiments.length > 0) {
-          missingExperimentalWarning(configFileName, enabledMissingExperiments)
-        }
         if (enabledExperiments.length > 0) {
           experimentalWarning(configFileName, enabledExperiments)
         }
@@ -389,9 +372,7 @@ function assignDefaults(userConfig: { [key: string]: any }) {
       (!Number.isInteger(images.minimumCacheTTL) || images.minimumCacheTTL < 0)
     ) {
       throw new Error(
-        `Specified images.minimumCacheTTL should be an integer 0 or more
-          ', '
-        )}), received  (${images.minimumCacheTTL}).\nSee more info here: https://nextjs.org/docs/messages/invalid-images-config`
+        `Specified images.minimumCacheTTL should be an integer 0 or more received (${images.minimumCacheTTL}).\nSee more info here: https://nextjs.org/docs/messages/invalid-images-config`
       )
     }
 
@@ -426,9 +407,7 @@ function assignDefaults(userConfig: { [key: string]: any }) {
       typeof images.dangerouslyAllowSVG !== 'boolean'
     ) {
       throw new Error(
-        `Specified images.dangerouslyAllowSVG should be a boolean
-          ', '
-        )}), received  (${images.dangerouslyAllowSVG}).\nSee more info here: https://nextjs.org/docs/messages/invalid-images-config`
+        `Specified images.dangerouslyAllowSVG should be a boolean received (${images.dangerouslyAllowSVG}).\nSee more info here: https://nextjs.org/docs/messages/invalid-images-config`
       )
     }
 
@@ -437,9 +416,7 @@ function assignDefaults(userConfig: { [key: string]: any }) {
       typeof images.contentSecurityPolicy !== 'string'
     ) {
       throw new Error(
-        `Specified images.contentSecurityPolicy should be a string
-          ', '
-        )}), received  (${images.contentSecurityPolicy}).\nSee more info here: https://nextjs.org/docs/messages/invalid-images-config`
+        `Specified images.contentSecurityPolicy should be a string received (${images.contentSecurityPolicy}).\nSee more info here: https://nextjs.org/docs/messages/invalid-images-config`
       )
     }
 
@@ -785,7 +762,27 @@ export async function loadConfig(
     const userConfig = await normalizeConfig(
       phase,
       userConfigModule.default || userConfigModule
-    )
+    );
+
+    const validateResult = validateConfig(userConfig)
+
+    if (validateResult.errors) {
+      Log.warn(`Invalid next.config.js options detected: `)
+
+      // Only load @segment/ajv-human-errors when invalid config is detected
+      const { AggregateAjvError } =
+        require('next/dist/compiled/@segment/ajv-human-errors') as typeof import('next/dist/compiled/@segment/ajv-human-errors')
+      const aggregatedAjvErrors = new AggregateAjvError(validateResult.errors, {
+        fieldLabels: 'js',
+      });
+      for (const error of aggregatedAjvErrors) {
+        console.error(`  - ${error.message}`)
+      }
+
+      console.error(
+        '\nSee more info here: https://nextjs.org/docs/messages/invalid-next-config'
+      )
+    }
 
     if (Object.keys(userConfig).length === 0) {
       Log.warn(

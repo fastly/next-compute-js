@@ -30,7 +30,7 @@ import { apiResolver, parseBody } from 'next/dist/server/api-utils/node';
 import { BaseNextRequest, BaseNextResponse } from 'next/dist/server/base-http';
 import BaseServer, { stringifyQuery } from 'next/dist/server/base-server';
 import { FontManifest } from 'next/dist/server/font-utils';
-import { addRequestMeta, NextParsedUrlQuery } from 'next/dist/server/request-meta';
+import { addRequestMeta, NextParsedUrlQuery, NextUrlWithParsedQuery } from 'next/dist/server/request-meta';
 import { RenderOpts, renderToHTML } from 'next/dist/server/render';
 import RenderResult from 'next/dist/server/render-result';
 import { Route } from 'next/dist/server/router';
@@ -61,6 +61,7 @@ import {
 } from './require';
 import { loadComponents } from './load-components';
 import { serveStatic } from './serve-static';
+import { getClonableBody } from "next/dist/server/body-streams";
 
 type ExpressMiddleware = (
   req: IncomingMessage,
@@ -537,7 +538,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
       (renderOpts.isAppPath || query.__flight__)
     ) {
       const isPagesDir = !renderOpts.isAppPath
-      return appRenderToHTML(
+      return appRenderToHTMLOrFlight(
         req.originalRequest,
         res.originalResponse,
         pathname,
@@ -727,6 +728,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     pathname: string,
     query: NextParsedUrlQuery = {},
     params: Params | null = null,
+    isAppDir: boolean = false
   ) {
     let paths = [
       // try serving a static AMP version first
@@ -777,7 +779,8 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
                   __flight__: query.__flight__,
                 } as NextParsedUrlQuery)
               : query),
-            ...(params || {}),
+            // For appDir params is excluded.
+            ...((isAppDir ? {} : params) || {}),
           },
         };
       } catch (err) {
@@ -860,6 +863,26 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
       routesManifestFile,
       this.dir
     );
+  }
+
+  protected attachRequestMeta(
+    req: BaseNextRequest,
+    parsedUrl: NextUrlWithParsedQuery
+  ) {
+    // In C@E, the protocol is always https on prod and http on dev
+    const hostname = fastly.env.get("FASTLY_HOSTNAME");
+    const protocol = hostname !== 'localhost' ? 'https' : 'http';
+
+    // When there are hostname and port we build an absolute URL
+    const initUrl =
+      this.hostname && this.port
+        ? `${protocol}://${this.hostname}:${this.port}${req.url}`
+        : req.url;
+
+    addRequestMeta(req, '__NEXT_INIT_URL', initUrl);
+    addRequestMeta(req, '__NEXT_INIT_QUERY', { ...parsedUrl.query });
+    addRequestMeta(req, '_protocol', protocol);
+    addRequestMeta(req, '__NEXT_CLONABLE_BODY', getClonableBody(req.body));
   }
 
   protected override async getFallback(page: string) {

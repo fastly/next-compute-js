@@ -64,7 +64,7 @@ export async function loadComponents(
   if (hasServerComponents) {
     try {
       // Make sure to also load the client entry in cache.
-      await requirePage(
+      const __client__ = await requirePage(
         assets,
         normalizePagePath(pathname) + NEXT_CLIENT_SSR_ENTRY_SUFFIX,
         dir,
@@ -72,6 +72,7 @@ export async function loadComponents(
         serverless,
         appDirEnabled
       );
+      ComponentMod.__client__ = __client__;
     } catch (_) {
       // This page might not be a server component page, so there is no
       // client entry to load.
