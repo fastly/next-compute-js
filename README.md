@@ -165,6 +165,21 @@ examples/       - Examples
 resources/      - Files in this directory are copied into the output project by the scaffolding tool   
 ```
 
+## Next.js Versions
+
+Next.js is under active development, and it makes fairly frequent updates to its internals, and
+sometimes those changes cause next-compute-js to break. 
+
+While newer versions of Next.js _may_ work, this version of next-compute-js supports Next.js **12.2.5**.
+
+See the following table for compatibility:
+
+| Next.js version | @fastly/next-compute-js version |
+|-----------------|---------------------------------|
+| 12.2.2          | 0.1.1-beta.4                    |
+| 12.2.4          | 0.2.2 (current)                 |
+| 12.2.5          | 0.2.2 (current)                 |
+
 ## Issues
 
 If you encounter any non-security-related bug or unexpected behavior, please [file an issue][bug]
