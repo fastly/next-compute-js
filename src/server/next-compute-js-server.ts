@@ -481,8 +481,6 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     page: string,
     builtPagePath: string,
   ): Promise<boolean> {
-    console.log({query, params, page, builtPagePath});
-
     // node's next-server would try to run this first as an edge function.
     // TODO: do that one day =)
 
