@@ -193,10 +193,10 @@
     process "^0.11.10"
     stream-browserify "^3.0.0"
 
-"@fastly/js-compute@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@fastly/js-compute/-/js-compute-0.3.0.tgz#682fc8982ca863879b1fd025e446d6670ae3934e"
-  integrity sha512-Re4F1t94QSfAzfYC54lhQ14po7aiOf7Gls4/f1E3TP7a4+VDpYwLOa3l9IPv57iKizujNd4aDhck+mzPhTylkA==
+"@fastly/js-compute@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@fastly/js-compute/-/js-compute-0.4.0.tgz#10d8397621eaec10850c431220123d6bb8e91ddf"
+  integrity sha512-3tPiJwB19KKwtd9x5xj6cIg3v246gUol9Op6IVPDreRazOM0ceMKG9jXP57Q/3ky2BlyZ1v+3YyGH9wJYlBlng==
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
