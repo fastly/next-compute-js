@@ -5,7 +5,7 @@ Deploy and serve your [Next.js](https://nextjs.org) website from Fastly's blazin
 ## Next.js
 
 Next.js is a popular JavaScript-based server framework that gives the developer a great experience –
-the ability to write in React for the frontend, and a convenient and intuitive way to set up some of the best features
+the ability to write in [React](https://reactjs.org) for the frontend, and a convenient and intuitive way to set up some of the best features
 you need for production: hybrid static & server rendering, smart bundling, route prefetching, and more, with very little
 configuration needed.
 
@@ -86,7 +86,7 @@ npm run fastly-publish
 ## Configuring the Compute@Edge application
 
 Being a Compute@Edge JavaScript application, the generated project contains a
-[https://developer.fastly.com/reference/compute/fastly-toml](`fastly.toml`) file.
+[`fastly.toml`](https://developer.fastly.com/reference/compute/fastly-toml) file.
 Before publishing your project, you may want to update the various fields to specify
 your project name, the author name, and the service ID.
 
