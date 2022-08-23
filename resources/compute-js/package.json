@@ -14,7 +14,7 @@
     },
     "devDependencies": {
         "@fastly/compute-js-static-publish": "^2.0.0",
-        "@fastly/next-compute-js": "^0.2.3",
+        "@fastly/next-compute-js": "^0.2.4",
         "assert": "^2.0.0",
         "browserify-zlib": "^0.2.0",
         "buffer": "^6.0.3",
