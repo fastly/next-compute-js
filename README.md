@@ -1,31 +1,27 @@
-## Next.js on Compute@Edge
+# Next.js on Compute@Edge
 
-Deploy and serve your [https://nextjs.org](Next.js) website from Fastly's blazing-fast [Compute@Edge](https://developer.fastly.com/learning/compute/).
+Deploy and serve your [Next.js](https://nextjs.org) website from Fastly's blazing-fast [Compute@Edge](https://developer.fastly.com/learning/compute/).
+
+## Next.js
+
+Next.js is a popular JavaScript-based server framework that gives the developer a great experience –
+the ability to write in React for the frontend, and a convenient and intuitive way to set up some of the best features
+you need for production: hybrid static & server rendering, smart bundling, route prefetching, and more, with very little
+configuration needed.
 
 ## Usage
 
-Use [https://nextjs.org/docs/getting-started](`create-next-app`) or any normal method to set up your `Next.js` app.
+Use [create-next-app](https://nextjs.org/docs/getting-started) (or [any alternative method](https://nextjs.org/docs/getting-started#manual-setup))
+to set up your Next.js app.
 
-Build your site normally as you would in Next.js, and use Next.js's built-in development server during
+Build your site normally as you would in Next.js, and use its built-in development server during
 development:
-
-```shell
-yarn dev
-```
-
-or
 
 ```shell
 npm run dev
 ```
 
 When you're ready to deploy your site to Compute@Edge, build your site with the standard build tool:
-
-```shell
-yarn build
-```
-
-or
 
 ```shell
 npm run build
@@ -40,10 +36,11 @@ To run this in Compute@Edge, run:
 npx @fastly/next-compute-js init
 ```
 
-This will generate a Compute@Edge project for you and place it in a `./compute-js` directory.
+This will generate a Compute@Edge project for you and place it in a directory called `./compute-js`.
 
 This program can then be [served (local development server)](https://developer.fastly.com/learning/compute/testing/#running-a-local-testing-server)
-or [published (to compute@edge service)](https://developer.fastly.com/learning/compute/#deploy-the-project-to-a-new-fastly-service) by using the following commands.
+or [published (to a Compute@Edge service)](https://developer.fastly.com/learning/compute/#deploy-the-project-to-a-new-fastly-service)
+by using the following commands.
 
 Local Development:
 ```shell
@@ -57,7 +54,7 @@ cd ./compute-js
 fastly compute publish
 ```
 
-Remember that if you ever change your source files, you will have to run `yarn build` (or `npm run build`) again to
+Remember that if you ever change your source files, you will have to run `npm run build` again to
 update the built files in your `.next` directory.
 
 ## Scripts
@@ -68,27 +65,27 @@ that you add the following scripts to your `package.json` file.
 ```
 {
   "scripts": {
-    "fastly-compute-serve": "next build && cd compute-js && fastly compute serve --verbose"
-    "fastly-compute-publish": "next build && cd compute-js && fastly compute publish --verbose"
+    "fastly-serve": "next build && cd compute-js && fastly compute serve --verbose"
+    "fastly-publish": "next build && cd compute-js && fastly compute publish --verbose"
   }
 }
 ```
 
-Now, you can use the following commands to run or publish your project:
+Now, you can use the following commands to build, and then run or publish your project:
 
 Local Development:
 ```shell
-yarn fastly-compute-serve
+npm run fastly-serve
 ```
 
 Deploy to Compute@Edge:
 ```shell
-yarn fastly-compute-publish
+npm run fastly-publish
 ```
 
 ## Configuring the Compute@Edge application
 
-Being a normal Compute@Edge JavaScript application, the generated project contains a
+Being a Compute@Edge JavaScript application, the generated project contains a
 [https://developer.fastly.com/reference/compute/fastly-toml](`fastly.toml`) file.
 Before publishing your project, you may want to update the various fields to specify
 your project name, the author name, and the service ID.
@@ -136,16 +133,24 @@ The following features are not supported at the current time:
 * Incremental Static Regeneration
 * Dynamic Import
 
+## API Routes / Middleware
+
+We support [API Routes and Middleware](https://nextjs.org/docs/api-routes/introduction). The handlers in your application
+will receive Node.js-style request and response objects that have Next.js [Request](https://nextjs.org/docs/api-routes/request-helpers)
+and [Response](https://nextjs.org/docs/api-routes/response-helpers) helpers applied to them.
+
+At the current time, [Edge API Routes](https://nextjs.org/docs/api-routes/edge-api-routes) and
+[Middleware](https://nextjs.org/docs/advanced-features/middleware) are not supported.
+
 ## How it works
 
 Internally this is a custom implementation of the `NextServer` class provided by Next.js.
-On instantiation, it uses [`@fastly/http-compute-js`](https://github.com/fastly/http-compute-js) to simulate Node.js's
-request and response objects, and uses [`@fastly/compute-js-static-publish`](https://github.com/fastly/compute-js-static-publish)
-to load up the files from the filesystem under the `./next` directory generated by `next build`. 
+This implementation uses [`@fastly/compute-js-static-publish`](https://github.com/fastly/compute-js-static-publish)
+to load up the files from the filesystem under the `./.next` directory generated by `next build`. 
 
 ## Developing
 
-The following lists the directory structure of the tool and the library
+The following lists the directory structure of the tool and the library.
 
 ```
 src/
@@ -167,10 +172,10 @@ resources/      - Files in this directory are copied into the output project by 
 
 ## Next.js Versions
 
-Next.js is under active development, and it makes fairly frequent updates to its internals, and
-sometimes those changes cause next-compute-js to break. 
+Next.js is under active development, and it makes fairly frequent updates to its internals.
+Sometimes those changes cause incompatibilities with the current version of `next-compute-js`. 
 
-While newer versions of Next.js _may_ work, this version of next-compute-js supports Next.js **12.2.5**.
+While newer versions of Next.js _may_ work, this version of `next-compute-js` supports Next.js **12.2.5**.
 
 See the following table for compatibility:
 
