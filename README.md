@@ -65,7 +65,7 @@ that you add the following scripts to your `package.json` file.
 ```
 {
   "scripts": {
-    "fastly-serve": "next build && cd compute-js && fastly compute serve --verbose"
+    "fastly-serve": "next build && cd compute-js && fastly compute serve --verbose",
     "fastly-publish": "next build && cd compute-js && fastly compute publish --verbose"
   }
 }
