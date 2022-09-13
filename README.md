@@ -175,15 +175,16 @@ resources/      - Files in this directory are copied into the output project by 
 Next.js is under active development, and it makes fairly frequent updates to its internals.
 Sometimes those changes cause incompatibilities with the current version of `next-compute-js`. 
 
-While newer versions of Next.js _may_ work, this version of `next-compute-js` supports Next.js **12.2.5**.
+While newer versions of Next.js _may_ work, this version of `next-compute-js` supports Next.js **12.3.0**.
 
 See the following table for compatibility:
 
 | Next.js version | @fastly/next-compute-js version |
 |-----------------|---------------------------------|
 | 12.2.2          | 0.1.1-beta.4                    |
-| 12.2.4          | 0.2.5 (current)                 |
-| 12.2.5          | 0.2.5 (current)                 |
+| 12.2.4          | 0.2.5                           |
+| 12.2.5          | 0.2.5                           |
+| 12.3.0          | 0.2.6 (current)                 |
 
 ## Issues
 
