@@ -1,6 +1,6 @@
 {
   "name": "@fastly/next-compute-js",
-  "version": "0.2.5",
+  "version": "0.2.6-alpha.0",
   "license": "MIT",
   "description": "Next.js for Fastly Compute@Edge",
   "main": "./build/src/index.js",
@@ -16,7 +16,7 @@
     "test": "nyc ts-mocha -p tsconfig.json --require test/mocha_bootstrap.js test/testHelpers.ts test/**/*.test.ts"
   },
   "peerDependencies": {
-    "next": "^12.2.4",
+    "next": "^12.3.0",
     "react": "^17.0.2 || ^18.0.0-0",
     "react-dom": "^17.0.2 || ^18.0.0-0"
   },
@@ -40,7 +40,7 @@
     "@types/sinon": "^10.0.13",
     "assert": "^2.0.0",
     "mocha": "^10.0.0",
-    "next": "12.2.4",
+    "next": "^12.3.0",
     "nyc": "^15.1.0",
     "sinon": "^14.0.0",
     "ts-mocha": "^10.0.0",

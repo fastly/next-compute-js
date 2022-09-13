@@ -3,6 +3,8 @@
  * Licensed under the MIT license. See LICENSE file for details.
  */
 
+import type { IncomingMessage } from 'http';
+
 import { toComputeResponse, toReqRes } from '@fastly/http-compute-js';
 import { PHASE_PRODUCTION_SERVER } from 'next/constants';
 
@@ -42,6 +44,12 @@ export class NextServer {
   async getRequestHandler() {
     return (await this.getServer())
       .getRequestHandler();
+  }
+
+  getUpgradeHandler() {
+    return async (req: IncomingMessage, socket: any, head: any) => {
+      throw new Error("Upgrading not supported");
+    }
   }
 
   async handleFetchEvent(event: FetchEvent) {
