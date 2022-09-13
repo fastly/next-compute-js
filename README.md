@@ -182,8 +182,8 @@ See the following table for compatibility:
 | Next.js version | @fastly/next-compute-js version |
 |-----------------|---------------------------------|
 | 12.2.2          | 0.1.1-beta.4                    |
-| 12.2.4          | 0.2.4 (current)                 |
-| 12.2.5          | 0.2.4 (current)                 |
+| 12.2.4          | 0.2.5 (current)                 |
+| 12.2.5          | 0.2.5 (current)                 |
 
 ## Issues
 
