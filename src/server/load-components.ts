@@ -7,13 +7,12 @@
 
 import { join } from 'path';
 
-import { BUILD_MANIFEST, FLIGHT_MANIFEST, NEXT_CLIENT_SSR_ENTRY_SUFFIX, REACT_LOADABLE_MANIFEST } from 'next/constants';
+import { BUILD_MANIFEST, FLIGHT_MANIFEST, REACT_LOADABLE_MANIFEST } from 'next/constants';
 import { interopDefault } from 'next/dist/lib/interop-default';
 import { LoadComponentsReturnType } from 'next/dist/server/load-components';
-import { normalizePagePath } from 'next/dist/shared/lib/page-path/normalize-page-path';
 
 import { Assets } from './common';
-import { getPagePath, readAssetManifest, requirePage } from './require';
+import { readAssetManifest, requirePage } from './require';
 
 /**
  * Loads React component associated with a given pathname.
@@ -26,8 +25,8 @@ export async function loadComponents(
   pathname: string,
   dir: string,
   serverless: boolean,
-  hasServerComponents?: boolean,
-  appDirEnabled?: boolean
+  hasServerComponents: boolean,
+  isAppPath: boolean
 ): Promise<LoadComponentsReturnType> {
   if (serverless) {
     return {
@@ -41,17 +40,22 @@ export async function loadComponents(
     };
   }
 
-  const [DocumentMod, AppMod, ComponentMod] = await Promise.all([
-    Promise.resolve().then(() =>
-      requirePage(assets, '/_document', dir, distDir, serverless, appDirEnabled)
-    ),
-    Promise.resolve().then(() =>
-      requirePage(assets, '/_app', dir, distDir, serverless, appDirEnabled)
-    ),
-    Promise.resolve().then(() =>
-      requirePage(assets, pathname, dir, distDir, serverless, appDirEnabled)
-    ),
-  ]);
+  let DocumentMod = {};
+  let AppMod = {};
+  if (!isAppPath) {
+    [DocumentMod, AppMod] = await Promise.all([
+      Promise.resolve().then(() =>
+        requirePage(assets, '/_document', dir, distDir, serverless, false)
+      ),
+      Promise.resolve().then(() =>
+        requirePage(assets, '/_app', dir, distDir, serverless, false)
+      ),
+    ]);
+  }
+
+  const ComponentMod = await Promise.resolve().then(() =>
+    requirePage(assets, pathname, dir, distDir, serverless, isAppPath)
+  );
 
   const [buildManifest, reactLoadableManifest, serverComponentManifest] = await Promise.all([
     readAssetManifest(assets, join(distDir, BUILD_MANIFEST), dir),
@@ -61,45 +65,11 @@ export async function loadComponents(
       : null,
   ]);
 
-  if (hasServerComponents) {
-    try {
-      // Make sure to also load the client entry in cache.
-      const __client__ = await requirePage(
-        assets,
-        normalizePagePath(pathname) + NEXT_CLIENT_SSR_ENTRY_SUFFIX,
-        dir,
-        distDir,
-        serverless,
-        appDirEnabled
-      );
-      ComponentMod.__client__ = __client__;
-    } catch (_) {
-      // This page might not be a server component page, so there is no
-      // client entry to load.
-    }
-  }
-
   const Component = interopDefault(ComponentMod);
   const Document = interopDefault(DocumentMod);
   const App = interopDefault(AppMod);
 
   const { getServerSideProps, getStaticProps, getStaticPaths } = ComponentMod;
-
-  let isAppPath = false;
-
-  if (appDirEnabled) {
-    const pagePath = getPagePath(
-      assets,
-      pathname,
-      dir,
-      distDir,
-      serverless,
-      false,
-      undefined,
-      appDirEnabled
-    );
-    isAppPath = !!pagePath?.match(/server[/\\]app[/\\]/);
-  }
 
   return {
     App,
