@@ -9,7 +9,7 @@
         "prebuild": "npx check-next-version && npx @fastly/compute-js-static-publish --build-static && webpack"
     },
     "dependencies": {
-        "@fastly/js-compute": "^0.4.0",
+        "@fastly/js-compute": "^0.5.2",
         "util": "^0.12.4"
     },
     "devDependencies": {
