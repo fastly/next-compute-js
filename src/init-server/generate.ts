@@ -6,6 +6,7 @@
 import child_process from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import nunjucks from 'nunjucks';
 
 const COMPUTE_JS_DIR = './compute-js';
 
@@ -20,6 +21,7 @@ export function checkServerProject() {
 
 type CopyOptions = {
   toFileName?: string,
+  templateContext?: object,
 };
 
 export function copyResourceFile(filePath: string, src: string, target: string, opts?: CopyOptions) {
@@ -28,8 +30,15 @@ export function copyResourceFile(filePath: string, src: string, target: string, 
   if(opts?.toFileName != null) {
     targetFilePath = path.join(path.dirname(targetFilePath), opts.toFileName);
   }
-  console.log(srcFilePath + ' -> ' + targetFilePath);
-  fs.copyFileSync(srcFilePath, targetFilePath);
+  if(opts?.templateContext != null) {
+    console.log(srcFilePath + ' -> ' + targetFilePath + ' (template)');
+    const srcFile = fs.readFileSync(srcFilePath, 'utf-8');
+    const destFile = nunjucks.renderString(srcFile, opts.templateContext);
+    fs.writeFileSync(targetFilePath, destFile, 'utf-8');
+  } else {
+    console.log(srcFilePath + ' -> ' + targetFilePath);
+    fs.copyFileSync(srcFilePath, targetFilePath);
+  }
 }
 
 export function generateServerProject() {
@@ -39,8 +48,34 @@ export function generateServerProject() {
     process.exit(1);
   }
 
+  let packageJsonContent: string | null;
+  try {
+    const packageJsonPathname = path.resolve('./package.json');
+    packageJsonContent = fs.readFileSync(packageJsonPathname, 'utf-8');
+  } catch {
+    console.error('❌ package.json not found in current directory.');
+    process.exit(1);
+  }
+
+  let packageJson: any;
+  try {
+    packageJson = JSON.parse(packageJsonContent);
+  } catch {
+    console.error('❌ Unable to parse package.json in current directory.');
+    process.exit(1);
+  }
+
+  let name: string;
+  if(packageJson.name != null) {
+    name = packageJson.name + '-next-compute-js-app';
+  } else {
+    name = "next-compute-js-app";
+    console.warn(`package.json does not define a 'name'. Using default name: ${name}`);
+  }
+
   const computeJsDir = path.resolve(COMPUTE_JS_DIR);
   console.log("Initializing Compute@Edge Application in " + computeJsDir + "...");
+  console.log("Application name: " + name);
   fs.mkdirSync(computeJsDir);
   fs.mkdirSync(path.resolve(computeJsDir, './src'));
 
@@ -51,8 +86,8 @@ export function generateServerProject() {
     '.nvmrc',
     '.npmrc',
     'default-content-types.cjs',
-    'fastly.toml',
-    'package.json',
+    ['fastly.toml.njk', 'fastly.toml'],
+    ['package.json.njk', 'package.json'],
     'static-publish.rc.js',
     'webpack.config.js',
   ];
@@ -63,6 +98,11 @@ export function generateServerProject() {
       [fromFile, copyOpts.toFileName] = file;
     } else {
       fromFile = file;
+    }
+    if(fromFile.endsWith('.njk')) {
+      copyOpts.templateContext = {
+        appName: name,
+      };
     }
     copyResourceFile(fromFile, 'compute-js', computeJsDir, copyOpts);
   }
