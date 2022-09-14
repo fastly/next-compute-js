@@ -13,7 +13,7 @@ import { getAssetContentType, readAssetFile } from './require';
  * (A reimplementation for Compute@Edge of function in Next.js of the same name,
  * found at next/server/serve-static.ts)
  */
-export async function serveStatic(
+export function serveStatic(
   assets: Assets,
   req: IncomingMessage,
   res: ServerResponse,
@@ -29,5 +29,7 @@ export async function serveStatic(
     res.setHeader('Content-Type', contentType);
   }
 
-  res.end(asset);
+  return new Promise(resolve => {
+    res.end(asset, () => resolve());
+  });
 }
