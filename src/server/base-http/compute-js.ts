@@ -12,4 +12,8 @@ export class ComputeJsNextRequest extends NodeNextRequest {
     super(req);
   }
 }
-export class ComputeJsNextResponse extends NodeNextResponse {}
+export class ComputeJsNextResponse extends NodeNextResponse {
+  // If this is set, then we use this response rather than
+  // the response built through the buffer.
+  overrideResponse?: Response;
+}

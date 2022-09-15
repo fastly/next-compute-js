@@ -61,6 +61,11 @@ export class NextServer {
     const requestHandler = await this.getRequestHandler();
     await requestHandler(nextRequest, nextResponse);
 
+    // If the handler has set a response directly, then use it
+    if(nextResponse.overrideResponse != null) {
+      return nextResponse.overrideResponse;
+    }
+
     return await toComputeResponse(res);
   }
 
