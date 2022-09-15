@@ -4,7 +4,7 @@ const { sync } = require('pkg-up');
 // The keys are Next.js versions, and the values are the newest
 // version of next-compute-js that is compatible with that version.
 
-const newestVersion = '0.2.10';
+const newestVersion = '0.3.0';
 
 const versionMatrix: Map<string, string> = new Map<string, string>([
   ['12.2.2', '0.1.1-beta.4'],
