@@ -25,32 +25,13 @@ export async function serveStatic(
   const decodedPath = decodeURIComponent(path);
   const asset = readAssetFile(assets, decodedPath, dir);
 
-  const outgoingHeaders = new Headers();
-
-  // Copy all the headers that have already been set on this response
-  // for example those set by setImmutableAssetCacheControl()
-  const nodeRes = res.originalResponse as ServerResponse;
-  for (const [key, value] of Object.entries(nodeRes.getHeaders())) {
-    if(value == null) {
-      continue;
-    }
-    if(Array.isArray(value)) {
-      for (const entry of value) {
-        outgoingHeaders.append(key, entry);
-      }
-    } else {
-      outgoingHeaders.append(key, String(value));
-    }
+  if(!(res.originalResponse as ServerResponse).getHeader('Content-Type')) {
+    const contentType = getAssetContentType(assets, decodedPath, dir);
+    (res.originalResponse as ServerResponse).setHeader('Content-Type', contentType);
   }
 
-  if(!outgoingHeaders.has('Content-Type')) {
-    outgoingHeaders.append('Content-Type',
-      getAssetContentType(assets, decodedPath, dir)
-    );
-  }
-
-  res.overrideResponse = new Response(asset, {
-    status: 200,
-    headers: outgoingHeaders,
+  return new Promise(resolve => {
+    (res.originalResponse as ServerResponse).end(asset, () => resolve());
   });
+
 }
