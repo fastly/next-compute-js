@@ -507,10 +507,11 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
   ): Promise<void> {
     return serveStatic(
       this.serverOptions.computeJs.assets,
-      req.originalRequest,
-      res.originalResponse,
+      req,
+      res,
       path,
       this.dir,
+      this.nextConfig.compress && this.nextConfig.target === 'server',
     );
   }
 

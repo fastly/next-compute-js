@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@fastly/http-compute-js": "^0.1.0",
+    "accepts": "^1.3.8",
     "arg": "^5.0.2",
     "chalk": "^4.1.2",
     "compression": "^1.7.4",
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "@fastly/js-compute": "^0.5.2",
+    "@types/accepts": "^1.3.5",
     "@types/assert": "^1.5.6",
     "@types/compression": "^1.7.2",
     "@types/mocha": "^9.1.1",
