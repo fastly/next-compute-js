@@ -49,7 +49,7 @@ export class NextServer {
   getUpgradeHandler() {
     return async (req: IncomingMessage, socket: any, head: any) => {
       throw new Error("Upgrading not supported");
-    }
+    };
   }
 
   async handleFetchEvent(event: FetchEvent) {
