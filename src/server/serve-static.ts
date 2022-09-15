@@ -51,6 +51,7 @@ export async function serveStatic(
 
   res.overrideResponse = new Response(asset, {
     status: 200,
+    statusText: 'OK',
     headers: outgoingHeaders,
   });
 }
