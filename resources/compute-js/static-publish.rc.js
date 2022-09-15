@@ -5,7 +5,7 @@
 
 module.exports = {
   publicDir: "../",
-  excludeDirs: [ './node_modules', './compute-js', './.next/cache' ],
+  excludeDirs: [ './node_modules', './compute-js', './pages', './.next/cache' ],
   includeDirs: [ './.next', './static', './public' ],
   staticDirs: [],
   excludeTest: function(path) {
