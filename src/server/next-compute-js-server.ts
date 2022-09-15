@@ -6,12 +6,10 @@
  */
 
 import { Buffer } from 'buffer';
-import type { IncomingMessage, ServerResponse } from 'http';
 import { join, relative, resolve } from 'path';
 import type { ParsedUrlQuery } from 'querystring';
 import { UrlWithParsedQuery, format as formatUrl } from 'url';
 
-import compression from 'compression';
 import {
   APP_PATHS_MANIFEST,
   BUILD_ID_FILE,
@@ -83,12 +81,6 @@ import { normalizeLocalePath } from "next/dist/shared/lib/i18n/normalize-locale-
 import { detectDomainLocale } from "next/dist/shared/lib/i18n/detect-domain-locale";
 import { removeTrailingSlash } from "next/dist/shared/lib/router/utils/remove-trailing-slash";
 import { isDynamicRoute } from "next/dist/shared/lib/router/utils";
-
-type ExpressMiddleware = (
-  req: IncomingMessage,
-  res: ServerResponse,
-  next: (err?: Error) => void
-) => void
 
 /**
  * Hardcoded every possible error status code that could be thrown by "serveStatic" method
@@ -176,10 +168,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     );
   }
 
-  private compression =
-    this.nextConfig.compress && this.nextConfig.target === 'server'
-      ? (compression() as ExpressMiddleware)
-      : undefined
+  private compression = this.nextConfig.compress && this.nextConfig.target === 'server';
 
   protected loadEnvConfig(params: { dev: boolean }): void {
     // NOTE: No ENV in Fastly Compute@Edge, at least for now
@@ -511,7 +500,6 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
       res,
       path,
       this.dir,
-      this.nextConfig.compress && this.nextConfig.target === 'server',
     );
   }
 
@@ -520,7 +508,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
     res: ComputeJsNextResponse
   ): void {
     if (this.compression) {
-      this.compression(req.originalRequest, res.originalResponse, () => {})
+      res.compress = true;
     }
   }
 

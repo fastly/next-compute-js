@@ -13,6 +13,9 @@ export class ComputeJsNextRequest extends NodeNextRequest {
   }
 }
 export class ComputeJsNextResponse extends NodeNextResponse {
+  // Whether to handle compression for this response
+  compress?: boolean;
+
   // If this is set, then we use this response rather than
   // the response built through the buffer.
   overrideResponse?: Response;

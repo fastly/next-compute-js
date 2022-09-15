@@ -5,6 +5,7 @@
 
 import type { IncomingMessage } from 'http';
 
+import accepts from 'accepts';
 import { toComputeResponse, toReqRes } from '@fastly/http-compute-js';
 import { PHASE_PRODUCTION_SERVER } from 'next/constants';
 
@@ -61,12 +62,32 @@ export class NextServer {
     const requestHandler = await this.getRequestHandler();
     await requestHandler(nextRequest, nextResponse);
 
+    let computeResponse: Response;
+
     // If the handler has set a response directly, then use it
     if(nextResponse.overrideResponse != null) {
-      return nextResponse.overrideResponse;
+      computeResponse = nextResponse.overrideResponse;
+    } else {
+      computeResponse = await toComputeResponse(res);
     }
 
-    return await toComputeResponse(res);
+    if (nextResponse.compress) {
+      const accept = accepts(req);
+      const encoding = accept.encodings(['gzip', 'deflate']) as 'gzip' | 'deflate' | false;
+      if (encoding) {
+        computeResponse.headers.append('Content-Encoding', encoding);
+        computeResponse = new Response(
+          computeResponse.body!.pipeThrough(new CompressionStream(encoding)),
+          {
+            status: computeResponse.status,
+            statusText: computeResponse.statusText,
+            headers: computeResponse.headers,
+          }
+        );
+      }
+    }
+
+    return computeResponse;
   }
 
 }
