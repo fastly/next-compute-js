@@ -30,7 +30,7 @@ export class MockedHeaders implements Headers {
   set!: (name: string, value: string) => void;
   append!: (name: string, value: string) => void;
   entries!: () => IterableIterator<[string, string]>;
-  forEach!: (callback: (value: string, name: string) => void) => void;
+  forEach!: (callback: (value: string, name: string, parent: Headers) => void) => void;
   keys!: () => IterableIterator<string>;
   values!: () => IterableIterator<[string]>;
   [Symbol.iterator]!: () => Iterator<[string, string]>;
@@ -90,6 +90,7 @@ export class MockedResponse implements Response {
     return Promise.resolve(this._body ?? '');
   };
 
+  statusText!: string;
   headers!: Headers;
   ok!: boolean;
   redirected!: boolean;
@@ -137,6 +138,8 @@ class FastlyMock implements Fastly {
     return logger;
   });
 
+  baseURL!: URL | null;
+  defaultBackend!: string;
   env!: Env;
   enableDebugLogging!: (enabled: boolean) => void;
   getGeolocationForIpAddress!: (address: string) => Geolocation;
