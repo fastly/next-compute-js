@@ -71,13 +71,13 @@ export class NextServer {
       computeResponse = await toComputeResponse(res);
     }
 
-    if (nextResponse.compress) {
+    if (nextResponse.compress && computeResponse.body != null) {
       const accept = accepts(req);
       const encoding = accept.encodings(['gzip', 'deflate']) as 'gzip' | 'deflate' | false;
       if (encoding) {
         computeResponse.headers.append('Content-Encoding', encoding);
         computeResponse = new Response(
-          computeResponse.body!.pipeThrough(new CompressionStream(encoding)),
+          computeResponse.body.pipeThrough(new CompressionStream(encoding)),
           {
             status: computeResponse.status,
             statusText: computeResponse.statusText,
