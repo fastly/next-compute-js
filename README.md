@@ -184,7 +184,7 @@ See the following table for compatibility:
 | 12.2.2          | 0.1.1-beta.4                    |
 | 12.2.4          | 0.2.5                           |
 | 12.2.5          | 0.2.5                           |
-| 12.3.0          | 0.3.0 (current)                |
+| 12.3.0          | 0.3.1 (current)                 |
 
 ## Issues
 
