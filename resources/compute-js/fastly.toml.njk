@@ -12,4 +12,4 @@ service_id = ""
 [local_server.backends]
 
 [scripts]
-  build = "npm run build"
+  build = "npx check-next-version && npx @fastly/compute-js-static-publish --build-static && $(npm bin)/webpack && $(npm bin)/js-compute-runtime ./bin/index.js ./bin/main.wasm"
