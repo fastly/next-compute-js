@@ -193,7 +193,7 @@
     process "^0.11.10"
     stream-browserify "^3.0.0"
 
-"@fastly/js-compute@^0.5.2":
+"@fastly/js-compute@^0.5.3":
   version "0.5.3"
   resolved "https://registry.yarnpkg.com/@fastly/js-compute/-/js-compute-0.5.3.tgz#5907f5186efe8dda4894f20a7cdbb74176317330"
   integrity sha512-4ZZJzLX1/egi3307a80nnc8c+0O5YTQ0gljbMLSxjQPcSSMqpDAkVah9E42Ec0dvPIG7e9+vgGf7r50wMezAVw==
