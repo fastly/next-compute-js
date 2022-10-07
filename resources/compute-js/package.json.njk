@@ -4,9 +4,7 @@
     "private": true,
     "license": "MIT",
     "scripts": {
-        "build": "js-compute-runtime bin/index.js bin/main.wasm",
-        "deploy": "npm run build && fastly compute deploy",
-        "prebuild": "npx check-next-version && npx @fastly/compute-js-static-publish --build-static && webpack"
+        "deploy": "fastly compute deploy"
     },
     "dependencies": {
         "@fastly/js-compute": "^0.5.3",
