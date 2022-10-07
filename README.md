@@ -186,6 +186,19 @@ See the following table for compatibility:
 | 12.2.5          | 0.2.5                           |
 | 12.3.0          | 0.3.1 (current)                 |
 
+## Troubleshooting
+
+If you're using Fastly CLI 4.0.0 or newer, and your project was scaffolded using a version
+of this tool older than 0.4.0, then you'll need to add the following to the
+`fastly.toml` file that is in your `compute-js` directory.
+
+```toml
+[scripts]
+  build = "npx check-next-version && npx @fastly/compute-js-static-publish --build-static && $(npm bin)/webpack && $(npm bin)/js-compute-runtime ./bin/index.js ./bin/main.wasm"
+```
+
+If Fastly CLI has already added `build = "npm run build"`, then replace it with the above.
+
 ## Issues
 
 If you encounter any non-security-related bug or unexpected behavior, please [file an issue][bug]
