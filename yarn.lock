@@ -194,9 +194,9 @@
     stream-browserify "^3.0.0"
 
 "@fastly/js-compute@^0.5.2":
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/@fastly/js-compute/-/js-compute-0.5.2.tgz#e927be59d23a1b6dc48b5f59b56b4ab94360ffa4"
-  integrity sha512-Dr0aw55M05kuRL9+awRtvJqu3Wo1kmxbuVqtX7Y9ke3LNKsmjDwf7T4WOAO4EQYIwtDGLVP8uIq4RxFxl5frlA==
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@fastly/js-compute/-/js-compute-0.5.3.tgz#5907f5186efe8dda4894f20a7cdbb74176317330"
+  integrity sha512-4ZZJzLX1/egi3307a80nnc8c+0O5YTQ0gljbMLSxjQPcSSMqpDAkVah9E42Ec0dvPIG7e9+vgGf7r50wMezAVw==
   dependencies:
     typedoc-loopingz-theme "^1.1.3"
 
