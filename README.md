@@ -188,6 +188,8 @@ See the following table for compatibility:
 
 ## Troubleshooting
 
+### `statics.js` not being built correctly?
+
 If you're using Fastly CLI 4.0.0 or newer, and your project was scaffolded using a version
 of this tool older than 0.4.0, then you'll need to add the following to the
 `fastly.toml` file that is in your `compute-js` directory.
@@ -197,7 +199,7 @@ of this tool older than 0.4.0, then you'll need to add the following to the
   build = "npx check-next-version && npx @fastly/compute-js-static-publish --build-static && $(npm bin)/webpack && $(npm bin)/js-compute-runtime ./bin/index.js ./bin/main.wasm"
 ```
 
-If Fastly CLI has already added `build = "npm run build"`, then replace it with the above.
+If Fastly CLI has already added `build = "$(npm bin)/webpack && $(npm bin)/js-compute-runtime ./bin/index.js ./bin/main.wasm"`, then replace it with the above.
 
 ## Issues
 
