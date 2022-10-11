@@ -116,7 +116,7 @@ The following Next.js features are supported:
 * Layouts
 * Font Optimization
 * Headers
-* MDX
+* MDX - (See note below)
 * Custom App
 * Custom Document
 * Custom Error Page
@@ -185,6 +185,33 @@ See the following table for compatibility:
 | 12.2.4          | 0.2.5                           |
 | 12.2.5          | 0.2.5                           |
 | 12.3.0          | 0.4.0 (current)                 |
+
+## MDX
+
+It's possible to use MDX by following the directions on this page on the Next.js
+website: [Using MDX with Next.js](https://nextjs.org/docs/advanced-features/using-mdx).
+
+The plugin performs its pre-rendering and compilation of MDX during build time,
+and for Compute@Edge you will need to exclude the `@next/mdx` plugin itself during
+runtime:
+
+```javascript
+if (!process.env.NEXT_COMPUTE_JS) {
+  // Apply MDX loader only at compile time
+  const withMDX = require('@next/mdx')({
+    extension: /\.mdx?$/,
+    options: {
+      remarkPlugins: [],
+      rehypePlugins: [],
+    },
+  });
+  module.exports = withMDX({
+    ...module.exports,
+    // Append the default value with md extensions
+    pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+  });
+}
+```
 
 ## Troubleshooting
 
