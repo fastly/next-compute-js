@@ -193,10 +193,10 @@
     process "^0.11.10"
     stream-browserify "^3.0.0"
 
-"@fastly/js-compute@^0.5.3":
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/@fastly/js-compute/-/js-compute-0.5.3.tgz#5907f5186efe8dda4894f20a7cdbb74176317330"
-  integrity sha512-4ZZJzLX1/egi3307a80nnc8c+0O5YTQ0gljbMLSxjQPcSSMqpDAkVah9E42Ec0dvPIG7e9+vgGf7r50wMezAVw==
+"@fastly/js-compute@^0.5.4":
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/@fastly/js-compute/-/js-compute-0.5.4.tgz#b4870f5557ff3519b0c34f50b3b4d4455aff0b5a"
+  integrity sha512-ZyrgbNLIu4tFnx8b/0fx5K0zsMdKvrT3ZVYHt4Bkxge91BfSGcOyRioonCtorJpiNHkQ0HZbGf/A+xp1Snt8Xg==
   dependencies:
     typedoc-loopingz-theme "^1.1.3"
 
