@@ -223,7 +223,7 @@ of this tool older than 0.4.0, then you'll need to add the following to the
 
 ```toml
 [scripts]
-  build = "npx check-next-version && npx @fastly/compute-js-static-publish --build-static && $(npm bin)/webpack && $(npm bin)/js-compute-runtime ./bin/index.js ./bin/main.wasm"
+  build = "npx check-next-version && npx @fastly/compute-js-static-publish --build-static --suppress-framework-warnings && $(npm bin)/webpack && $(npm bin)/js-compute-runtime ./bin/index.js ./bin/main.wasm"
 ```
 
 If Fastly CLI has already added `build = "$(npm bin)/webpack && $(npm bin)/js-compute-runtime ./bin/index.js ./bin/main.wasm"`, then replace it with the above.
