@@ -33,7 +33,7 @@ that contains all the files generated from your sources.
 To run this in Compute@Edge, run:
 
 ```shell
-npx @fastly/next-compute-js init
+npx @fastly/next-compute-js@latest init
 ```
 
 This will generate a Compute@Edge project for you and place it in a directory called `./compute-js`.
