@@ -61,6 +61,9 @@ module.exports = {
       NEXT_RUNTIME: 'edge',
       NEXT_COMPUTE_JS: true,
     }),
+    new webpack.optimize.LimitChunkCountPlugin({
+      maxChunks: 1,
+    }),
   ],
   resolve: {
     alias: {
