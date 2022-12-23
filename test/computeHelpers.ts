@@ -53,6 +53,7 @@ export class MockedRequest implements Request {
   arrayBuffer!: () => Promise<ArrayBuffer>;
   json!: () => Promise<any>;
   setCacheOverride!: (override: CacheOverride) => void;
+  setCacheKey!: (key: string) => void;
   text!: () => Promise<string>;
 }
 
@@ -140,7 +141,7 @@ class FastlyMock implements Fastly {
 
   baseURL!: URL | null;
   defaultBackend!: string;
-  env!: Env;
+  env!: { get: (name: string) => string };
   enableDebugLogging!: (enabled: boolean) => void;
   getGeolocationForIpAddress!: (address: string) => Geolocation;
   includeBytes!: (path: String) => Uint8Array;
