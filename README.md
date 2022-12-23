@@ -215,6 +215,38 @@ if (!process.env.NEXT_COMPUTE_JS) {
 
 ## Troubleshooting
 
+### Error: Cannot find module '@fastly/http-compute-js/dist/polyfill' 
+
+You may see the following problem if you have `@fastly/http-compute-js@0.3.2` installed:
+```
+[webpack-cli] Error: Cannot find module '@fastly/http-compute-js/dist/polyfill'
+```
+
+If so, you can re-scaffold your compute-js application with v0.7.2 or newer.
+
+Or, you can make the following changes to `webpack.config.js`:
+
+* Remove these lines
+
+```diff
+     new webpack.ProvidePlugin({
+       Buffer: [ 'buffer', 'Buffer' ],
+       process: 'process',
+-      setTimeout: [ 'timeout-polyfill', 'setTimeout' ],
+-      clearTimeout: [ 'timeout-polyfill', 'clearTimeout' ],
+     }),
+```
+
+* Remove these lines
+
+```diff
+     alias: {
+-      'timeout-polyfill': require.resolve('@fastly/http-compute-js/dist/polyfill'),
+       'next/dist/compiled/etag': require.resolve('@fastly/next-compute-js/build/src/util/etag'),
+       'next/dist/compiled/raw-body': require.resolve('raw-body'),
+     },
+```
+
 ### `statics.js` not being built correctly?
 
 If you're using Fastly CLI 4.0.0 or newer, and your project was scaffolded using a version

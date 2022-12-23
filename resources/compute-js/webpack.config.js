@@ -54,8 +54,6 @@ module.exports = {
     new webpack.ProvidePlugin({
       Buffer: [ 'buffer', 'Buffer' ],
       process: 'process',
-      setTimeout: [ 'timeout-polyfill', 'setTimeout' ],
-      clearTimeout: [ 'timeout-polyfill', 'clearTimeout' ],
     }),
     new webpack.EnvironmentPlugin({
       NEXT_RUNTIME: 'edge',
@@ -67,7 +65,6 @@ module.exports = {
   ],
   resolve: {
     alias: {
-      'timeout-polyfill': require.resolve('@fastly/http-compute-js/dist/polyfill'),
       'next/dist/compiled/etag': require.resolve('@fastly/next-compute-js/build/src/util/etag'),
       'next/dist/compiled/raw-body': require.resolve('raw-body'),
     },
