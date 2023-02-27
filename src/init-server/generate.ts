@@ -83,7 +83,6 @@ export function generateServerProject() {
   const files = [
     'src/index.js',
     ['_gitignore', '.gitignore'],
-    '.nvmrc',
     '.npmrc',
     'default-content-types.cjs',
     ['fastly.toml.njk', 'fastly.toml'],
