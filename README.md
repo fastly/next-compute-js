@@ -249,16 +249,28 @@ Or, you can make the following changes to `webpack.config.js`:
 
 ### `statics.js` not being built correctly?
 
-If you're using Fastly CLI 4.0.0 or newer, and your project was scaffolded using a version
-of this tool older than 0.4.0, then you'll need to add the following to the
-`fastly.toml` file that is in your `compute-js` directory.
+If you've recently updated the version of Fastly CLI, please check the build scripts defined in
+`fastly.toml` and `package.json`. The currently recommended default values are as follows:
 
+1. `fastly.toml`
+
+The `[scripts.build]` should look like this:
 ```toml
 [scripts]
-  build = "npx check-next-version && npx @fastly/compute-js-static-publish --build-static --suppress-framework-warnings && $(npm bin)/webpack && $(npm bin)/js-compute-runtime ./bin/index.js ./bin/main.wasm"
+build = "npm run build"
 ```
 
-If Fastly CLI has already added `build = "$(npm bin)/webpack && $(npm bin)/js-compute-runtime ./bin/index.js ./bin/main.wasm"`, then replace it with the above.
+2. `package.json`
+
+The `"scripts"` should contain the following values:
+
+```json
+{
+    "prebuild": "npx check-next-version && npx @fastly/compute-js-static-publish --build-static --suppress-framework-warnings && webpack",
+    "build": "js-compute-runtime ./bin/index.js ./bin/main.wasm",
+    "deploy": "npm run build && fastly compute deploy"
+}
+```
 
 ## Issues
 
