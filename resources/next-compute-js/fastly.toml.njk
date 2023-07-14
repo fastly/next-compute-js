@@ -1,0 +1,23 @@
+# This file describes a Fastly Compute@Edge package. To learn more visit:
+# https://developer.fastly.com/reference/fastly-toml/
+
+authors = []
+description = "NextJs Server"
+language = "javascript"
+manifest_version = 2
+name = "{{ appName }}"
+service_id = ""
+
+[local_server]
+[local_server.backends]
+
+# When the server is running on the local development environment,
+# it always uses "local-kvcache" as the name of the KV store used for caching.
+# This dummy entry exists as a placeholder to tell the local server that
+# it should initialize a KV store by this name.
+[[local_server.kv_stores.local-kvcache]]
+key = "dummy"
+data = "placeholder"
+
+[scripts]
+build = "npm run build"

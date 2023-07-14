@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### Updated
+
+- New architecture for v2
+  - This tool is now a scaffolding tool, and creates an app that orchestrates https://github.com/fastly/serve-vercel-build-output and
+    https://github.com/fastly/next-compute-js-server to run a Next.js application.
+- Adds support for Next.js 13.
+- Supported Next.js versions are 12.3.0 through 13.4.6.
+  - Note: The [App Router](https://nextjs.org/docs/app) is not yet supported.
+- New modular design allows us to build support for new versions more easily.
+  - Next.js applications are built as Vercel Build Output, and then executed using https://github.com/fastly/serve-vercel-build-output.  
+    - Adds support for Edge SSR / Edge API Routes by specifying the `edge` runtime.
+    - Adds support for Edge Middleware.
+    - Adds support for Incremental Static Regeneration, with support for On-demand Revalidation and Draft Mode (as well as Preview Mode).
+    - Adds support for React 18's streaming rendering mode.
+  - A handler for pages and API routes that target 'nodejs' have been moved to https://github.com/fastly/next-compute-js-server.
+
+### Changed
+
+- Switched from yarn to npm.
+- Scaffolded application is generated in `next-compute-js/` instead of `compute-js/`.
+
 ## [0.9.0] - 2023-02-27
 
 ### Updated
