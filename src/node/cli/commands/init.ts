@@ -191,6 +191,28 @@ export default function init(argv: string[]) {
 
   console.log(`Application initialized.`);
 
+  console.log(`\
+
+To build your Next.js application for Compute@Edge and run it in the
+local development environment, run:
+
+  npx @fastly/next-compute-js build
+  cd next-compute-js
+  fastly compute serve
+
+Or, run the following to do this in one go:
+
+  npm run fastly-serve
+
+To deploy the application to your Compute@Edge service, run:
+
+  npm run fastly-deploy
+
+For details, check out the README at https://unpkg.com/@fastly/next-compute-js@alpha/README.md.
+
+Good luck!
+`);
+
 }
 
 function displayHelp() {
