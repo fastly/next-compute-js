@@ -1,5 +1,16 @@
 # Next.js on Compute@Edge
 
+> NOTE: Version 2 is coming soon! It is a substantial update that contains support for additional features:
+> * Adds support for Next.js 13. New modular design allows us to build support for new versions more easily.
+>   * Note: The [App Router](https://nextjs.org/docs/app) is not yet supported.
+> * Adds support for React 18's streaming rendering mode.
+> * A new server layer that simulates Vercel's Middleware / Cache / Functions architecture.
+>   * Adds support for Edge SSR / Edge API Routes by specifying the `edge` runtime.
+>   * Adds support for Edge Middleware.
+>   * Adds support for Incremental Static Regeneration, with support for On-demand Revalidation and Draft Mode (as well as Preview Mode).
+>
+> Check it out at https://github.com/fastly/next-compute-js/tree/v2
+
 Deploy and serve your [Next.js](https://nextjs.org) website from Fastly's blazing-fast [Compute@Edge](https://developer.fastly.com/learning/compute/).
 
 ## Next.js
