@@ -33,6 +33,7 @@ const OPTION_DEFINITIONS: commandLineArgs.OptionDefinition[] = [
   { name: 'app-name', type: String, },
   { name: 'service-id', type: String, },
   { name: 'next-runtime', type: String, },
+  { name: 'no-error-if-exist', type: Boolean, }
 ];
 
 export default function init(argv: string[]) {
@@ -80,6 +81,14 @@ export default function init(argv: string[]) {
       nextRuntimeOverride = optionValue;
     }
   }
+  // no-error-if-exist
+  let noErrorIfExist;
+  {
+    const optionValue = commandLineOptions['no-error-if-exist'];
+    if (typeof optionValue === 'boolean') {
+      noErrorIfExist = optionValue;
+    }
+  }
 
   // load package.json
   let packageJson: any;
@@ -122,6 +131,10 @@ export default function init(argv: string[]) {
 
   const computeJsDir = path.resolve(NEXT_COMPUTE_JS_DIRECTORY_NAME);
   if (fs.existsSync(computeJsDir)) {
+    if (noErrorIfExist) {
+      console.log(`✅ @fastly/next-compute-js Compute@Edge project directory '${computeJsDir}' exists.`);
+      process.exit(0);
+    }
     console.log(`❌ @fastly/next-compute-js Compute@Edge project directory '${computeJsDir}' already exists.`);
     process.exit(1);
   }
@@ -189,7 +202,7 @@ export default function init(argv: string[]) {
     console.warn(new Error('Warning: setup-next-runtime did not complete successfully', { cause: ex }));
   }
 
-  console.log(`Application initialized.`);
+  console.log(`✅ Application initialized.`);
 
   console.log(`\
 
@@ -229,5 +242,6 @@ Flags:
   --service-id=<service-id>            - Sets the application's service ID in fastly.toml.
   --next-runtime=<pathspec-or-version> - Specifies an override next runtime to initialize
                                          application with. 
+  --no-error-if-exist                  - If the application already exists, then do not error.                                        
 `);
 }
