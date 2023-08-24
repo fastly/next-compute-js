@@ -1,6 +1,6 @@
 {
   "name": "@fastly/next-compute-js",
-  "version": "2.0.0-alpha.11",
+  "version": "2.0.0-alpha.12",
   "license": "MIT",
   "description": "Next.js for Fastly Compute@Edge",
   "type": "module",
