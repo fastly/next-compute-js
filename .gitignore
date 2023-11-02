@@ -6,6 +6,12 @@ yarn-debug.log*
 yarn-error.log*
 .nyc_output
 
+# Build artifacts
+.idea/
+.nyc_output/
+coverage/
+dist/
+
 # Dependency directories
 node_modules/
 build/

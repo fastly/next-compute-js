@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### Updated
+
+- Add some more specific directories to .gitignore
+
 ## [0.9.0] - 2023-02-27
 
 ### Updated
