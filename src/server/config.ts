@@ -714,7 +714,7 @@ function assignDefaults(userConfig: { [key: string]: any }) {
 
 /**
  * Loads the appropriate NextConfig for the specified phase.
- * (An adaptation for Compute@Edge of function in Next.js of the same name,
+ * (An adaptation for Compute of function in Next.js of the same name,
  * found at next/server/config.ts)
  */
 export async function loadConfig(
@@ -723,8 +723,8 @@ export async function loadConfig(
   dir: string,
   customConfig?: object | null,
 ) {
-  // no .env in Compute@Edge
-  // no webpack hooks in Compute@Edge
+  // no .env in Compute
+  // no webpack hooks in Compute
 
   let configFileName = 'next.config.js';
 

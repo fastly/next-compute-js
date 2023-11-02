@@ -118,8 +118,8 @@ const POSSIBLE_ERROR_CODE_FROM_SERVE_STATIC = new Set([
 ]);
 
 /**
- * An implementation of a Next.js server that has been adapted to run in Compute@Edge.
- * (An adaptation for Compute@Edge of NextNodeServer in Next.js,
+ * An implementation of a Next.js server that has been adapted to run in Compute.
+ * (An adaptation for Compute of NextNodeServer in Next.js,
  * found at next/server/next-server.ts)
  */
 export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptions> {
@@ -171,7 +171,7 @@ export default class NextComputeJsServer extends BaseServer<ComputeJsServerOptio
   private compression = this.nextConfig.compress && this.nextConfig.target === 'server';
 
   protected loadEnvConfig(params: { dev: boolean }): void {
-    // NOTE: No ENV in Fastly Compute@Edge, at least for now
+    // NOTE: No ENV in Fastly Compute, at least for now
   }
 
   protected getResponseCache({ dev }: { dev: boolean }) {

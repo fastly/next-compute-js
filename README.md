@@ -1,4 +1,4 @@
-# Next.js on Compute@Edge
+# Next.js on Compute
 
 > NOTE: Version 2 is coming soon! It is a substantial update that contains support for additional features:
 > * Adds support for Next.js 13. New modular design allows us to build support for new versions more easily.
@@ -11,7 +11,7 @@
 >
 > Check it out at https://github.com/fastly/next-compute-js/tree/v2
 
-Deploy and serve your [Next.js](https://nextjs.org) website from Fastly's blazing-fast [Compute@Edge](https://developer.fastly.com/learning/compute/).
+Deploy and serve your [Next.js](https://nextjs.org) website from Fastly's blazing-fast [Compute](https://developer.fastly.com/learning/compute/).
 
 ## Next.js
 
@@ -32,7 +32,7 @@ development:
 npm run dev
 ```
 
-When you're ready to deploy your site to Compute@Edge, build your site with the standard build tool:
+When you're ready to deploy your site to Compute, build your site with the standard build tool:
 
 ```shell
 npm run build
@@ -41,16 +41,16 @@ npm run build
 This creates an optimized build of your application and places the output into the `./.next` directory,
 that contains all the files generated from your sources.
 
-To run this in Compute@Edge, run:
+To run this in Compute, run:
 
 ```shell
 npx @fastly/next-compute-js@latest init
 ```
 
-This will generate a Compute@Edge project for you and place it in a directory called `./compute-js`.
+This will generate a Compute project for you and place it in a directory called `./compute-js`.
 
 This program can then be [served (local development server)](https://developer.fastly.com/learning/compute/testing/#running-a-local-testing-server)
-or [published (to a Compute@Edge service)](https://developer.fastly.com/learning/compute/#deploy-the-project-to-a-new-fastly-service)
+or [published (to a Compute service)](https://developer.fastly.com/learning/compute/#deploy-the-project-to-a-new-fastly-service)
 by using the following commands.
 
 Local Development:
@@ -59,7 +59,7 @@ cd ./compute-js
 fastly compute serve
 ```
 
-Deploy to Compute@Edge:
+Deploy to Compute:
 ```shell
 cd ./compute-js
 fastly compute publish
@@ -89,14 +89,14 @@ Local Development:
 npm run fastly-serve
 ```
 
-Deploy to Compute@Edge:
+Deploy to Compute:
 ```shell
 npm run fastly-publish
 ```
 
-## Configuring the Compute@Edge application
+## Configuring the Compute application
 
-Being a Compute@Edge JavaScript application, the generated project contains a
+Being a Compute JavaScript application, the generated project contains a
 [`fastly.toml`](https://developer.fastly.com/reference/compute/fastly-toml) file.
 Before publishing your project, you may want to update the various fields to specify
 your project name, the author name, and the service ID.
@@ -173,7 +173,7 @@ src/
   server/       - The code of the Next.js server implementation
   types/        - TypeScript types
   util/         - Util functions
-  core/         - Compute@Edge core libraries
+  core/         - Compute core libraries
 
 test/           - Unit tests (in progress)
 
@@ -203,7 +203,7 @@ It's possible to use MDX by following the directions on this page on the Next.js
 website: [Using MDX with Next.js](https://nextjs.org/docs/advanced-features/using-mdx).
 
 The plugin performs its pre-rendering and compilation of MDX during build time,
-and for Compute@Edge you will need to exclude the `@next/mdx` plugin itself during
+and for Compute you will need to exclude the `@next/mdx` plugin itself during
 runtime:
 
 ```javascript
