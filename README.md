@@ -1,6 +1,6 @@
-# Next.js on Compute@Edge
+# Next.js on Fastly Compute
 
-Deploy and serve your [Next.js](https://nextjs.org) website from Fastly's [Compute@Edge](https://developer.fastly.com/learning/compute/) platform.
+Deploy and serve your [Next.js](https://nextjs.org) website from Fastly's [Compute](https://developer.fastly.com/learning/compute/) platform.
 
 > NOTE: `@fastly/next-compute-js` is provided as a Fastly Labs product. Visit the [Fastly Labs](https://www.fastlylabs.com/) site for terms of use.
 
@@ -35,17 +35,17 @@ configuration needed.
 
 ## This library
 
-This library works by packaging the build artifacts from your Next.js site into a scaffolded Compute@Edge application
+This library works by packaging the build artifacts from your Next.js site into a scaffolded Compute application
 that simulates the Vercel runtime environment, mainly using these libraries:
 
 * [`@fastly/serve-vercel-build-output`](https://github.com/fastly/serve-vercel-build-output) - A server implementation
-  for Compute@Edge that simulates Vercel's Middleware / Cache / Functions infrastructure. It uses Fastly KV Store for
+  for Compute that simulates Vercel's Middleware / Cache / Functions infrastructure. It uses Fastly KV Store for
   caching.
 * [`@fastly/next-compute-js-server-x.x.x`](https://github.com/fastly/next-compute-js-server) - A custom implementation of
-  the `NextServer` class provided by Next.js designed to work on Compute@Edge. Note that the `x.x.x` part of the name of
+  the `NextServer` class provided by Next.js designed to work on Compute. Note that the `x.x.x` part of the name of
   the library you use lines up with the specific version of Next.js used by your project (See [details](#next-compute-js-server)).
 * [`@fastly/compute-js-static-publish`](https://github.com/fastly/compute-js-static-publish) - A library that provides runtime
-  access to the build artifacts packaged in the Compute@Edge application.
+  access to the build artifacts packaged in the Compute application.
 
 ## Usage
 
@@ -58,8 +58,8 @@ Prerequisites:
 Follow these steps:
 
 * [Develop your site](#develop-your-site)
-* [Create your Compute@Edge project](#create-compute-js)
-* [Set up Compute@Edge Next.js Server Runtime library](#next-compute-js-server)
+* [Create your Compute project](#create-compute-js)
+* [Set up Compute Next.js Server Runtime library](#next-compute-js-server)
 * [Configuration](#configuration)
 * [Test the project locally](#testing-locally)
 * [Deploy the project to your Fastly service](#deploy-to-fastly)
@@ -103,7 +103,7 @@ development:
 npm run dev
 ```
 
-### <a name='create-compute-js'></a> Create your Compute@Edge project
+### <a name='create-compute-js'></a> Create your Compute project
 
 > HINT: Since this is a prerelease version, you'll need to add @fastly/next-compute-js to your project.
 > 
@@ -113,7 +113,7 @@ npm run dev
 > npm install @fastly/next-compute-js@alpha
 > ```
 
-In your project directory, type the following command to scaffold a Compute@Edge project:
+In your project directory, type the following command to scaffold a Compute project:
 
 ```shell
 npx @fastly/next-compute-js init
@@ -124,11 +124,11 @@ This will result in a `./next-compute-js` directory, initialized with applicatio
 Directory Structure:
 ```
 my-next-app/                 - Project root
-  next-compute-js/           - Scaffolded Compute@Edge program
-    src/index.js             - Compute@Edge entry point
+  next-compute-js/           - Scaffolded Compute program
+    src/index.js             - Compute entry point
     package.json             - Project manifest file
-    server.config.json       - Compute@Edge specific config options
-    fastly.toml              - Fastly Compute@Edge manifest
+    server.config.json       - Compute specific config options
+    fastly.toml              - Fastly Compute manifest
     static-publish.rc.js     - ComputeJS Static Publisher config file
     webpack.config.js        - Webpack config file
     .gitignore
@@ -142,7 +142,7 @@ The program also updates your project's package.json file, adding the fastly-ser
 
 The program then automatically moves on to set up the Next.js runtime automatically (next step).
 
-### <a name="next-compute-js-server"></a> Set up Compute@Edge Next.js Server Runtime library
+### <a name="next-compute-js-server"></a> Set up Compute Next.js Server Runtime library
 
 Next.js is under active development, and receives frequent updates that make changes to its internals. Unfortunately,
 this causes incompatibilities between our custom implementation and the classes provided by Next.js.
@@ -161,12 +161,12 @@ npx @fastly/next-compute-js setup-next-runtime
 ```
 
 The program examines the version of Next.js used by your app, and adds the appropriate runtime library to the
-Compute@Edge application, or displays an error message if you are running an unsupported version of Next.js.
+Compute application, or displays an error message if you are running an unsupported version of Next.js.
 
 ### Configuration
 
 In addition to any configuration that applies to your Next.js application in terms of `next.config.js`, you may need to
-configure the following aspects of your Compute@Edge application.
+configure the following aspects of your Compute application.
 
 #### Backends
 
@@ -249,7 +249,7 @@ const config = {
 
 ### <a name="running-locally"></a> Test the project locally
 
-You can run your Compute@Edge application in
+You can run your Compute application in
 [Fastly's local development environment](https://developer.fastly.com/learning/compute/testing/#running-a-local-testing-server).
 
 After initializing your project and setting up the runtime, from inside the Next app's root directory, type the following:
@@ -259,7 +259,7 @@ npm run fastly-serve
 ```
 
 The process will build your Next.js project, then switch to the `next-compute-js` directory, build and package the
-Compute@Edge application to Wasm, and then start the Fastly development environment.
+Compute application to Wasm, and then start the Fastly development environment.
 
 It will be possible to browse to your local site by accessing http://localhost:7676/.
 
@@ -270,13 +270,13 @@ For details on how building the project works, see [How it works](#how-it-works)
 
 ### <a name="deploy-to-fastly"></a> Deploy the project to your Fastly service
 
-When you're ready to deploy your site to Compute@Edge, from inside the Next app's root directory, type the following:
+When you're ready to deploy your site to Compute, from inside the Next app's root directory, type the following:
 
 ```shell
 npm run fastly-deploy
 ```
 
-The process will build your Next.js project, then switch to the `next-compute-js` directory, build and package the Compute@Edge
+The process will build your Next.js project, then switch to the `next-compute-js` directory, build and package the Compute
 application to Wasm, and then [start the deployment process to your Fastly service](https://developer.fastly.com/learning/compute/#deploy-the-project-to-a-new-fastly-service).
 
 If you haven't already created a service for your application, you will be prompted for your service's
@@ -291,9 +291,9 @@ If the Server-Side parts of your application need any access to backends while r
 [define them](https://developer.fastly.com/reference/compute/fastly-toml/) in the `fastly.toml` file.
 
 
-## Configuring the Compute@Edge application
+## Configuring the Compute application
 
-Being a Compute@Edge JavaScript application, the generated project contains a
+Being a Compute application, the generated project contains a
 [`fastly.toml`](https://developer.fastly.com/reference/compute/fastly-toml) file.
 Before publishing your project, you may want to update the various fields to specify
 your project name, the author name, and the service ID.

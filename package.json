@@ -2,7 +2,7 @@
   "name": "@fastly/next-compute-js",
   "version": "2.0.0-alpha.12",
   "license": "MIT",
-  "description": "Next.js for Fastly Compute@Edge",
+  "description": "Next.js for Fastly Compute",
   "type": "module",
   "bin": "./dist/node/cli/index.js",
   "scripts": {

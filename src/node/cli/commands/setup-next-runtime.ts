@@ -72,7 +72,7 @@ export default function setupNextRuntime(argv: string[]) {
 
   const computeJsDir = path.resolve(NEXT_COMPUTE_JS_DIRECTORY_NAME);
   if (!fs.existsSync(computeJsDir)) {
-    console.log(`❌ @fastly/next-compute-js Compute@Edge project directory '${computeJsDir}' must exist. Try running 'init' command first.`);
+    console.log(`❌ @fastly/next-compute-js Compute project directory '${computeJsDir}' must exist. Try running 'init' command first.`);
     process.exit(1);
   }
 
@@ -156,9 +156,9 @@ export default function setupNextRuntime(argv: string[]) {
 
 function displayHelp() {
   console.log(`\
-next-compute-js: Run your Next.js application on Compute@Edge JavaScript.
+next-compute-js: Run your Next.js application on Fastly Compute.
 
-Sets up or updates the Compute@Edge Next.js Server Runtime library.
+Sets up or updates the Compute Next.js Server Runtime library.
 
 Usage:
   npx @fasty/next-compute-js setup-next-runtime [<flags>]

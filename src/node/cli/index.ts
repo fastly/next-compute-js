@@ -43,7 +43,7 @@ async function main() {
 
 function displayHelp() {
   console.log(`\
-next-compute-js: Run your Next.js application on Compute@Edge JavaScript.
+next-compute-js: Run your Next.js application on Fastly Compute.
 
 Run this command from your Next.js application's directory, in other words the one that
 contains your package.json file that references "next".
@@ -53,8 +53,8 @@ Usage:
 
 <command> can be one of the following:
 
-  init                  - Initializes a Compute@Edge application.
-  setup-next-runtime    - Sets up or updates the Compute@Edge Next.js Server Runtime library.
+  init                  - Initializes a Compute application.
+  setup-next-runtime    - Sets up or updates the Compute Next.js Server Runtime library.
   build                 - Builds and transforms the Next.js application for running under next-compute-js.
 
 To get help for any of the commands, run the command with the --help flag.

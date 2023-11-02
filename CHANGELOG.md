@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Adds support for Incremental Static Regeneration, with support for On-demand Revalidation and Draft Mode (as well as Preview Mode).
     - Adds support for React 18's streaming rendering mode.
   - A handler for pages and API routes that target 'nodejs' have been moved to https://github.com/fastly/next-compute-js-server.
+- Applies "Compute" branding change.
 
 ### Changed
 

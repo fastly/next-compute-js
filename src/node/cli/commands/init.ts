@@ -132,14 +132,14 @@ export default function init(argv: string[]) {
   const computeJsDir = path.resolve(NEXT_COMPUTE_JS_DIRECTORY_NAME);
   if (fs.existsSync(computeJsDir)) {
     if (noErrorIfExist) {
-      console.log(`✅ @fastly/next-compute-js Compute@Edge project directory '${computeJsDir}' exists.`);
+      console.log(`✅ @fastly/next-compute-js Compute project directory '${computeJsDir}' exists.`);
       process.exit(0);
     }
-    console.log(`❌ @fastly/next-compute-js Compute@Edge project directory '${computeJsDir}' already exists.`);
+    console.log(`❌ @fastly/next-compute-js Compute project directory '${computeJsDir}' already exists.`);
     process.exit(1);
   }
 
-  console.log(`Initializing Compute@Edge Application in '${computeJsDir}'...`);
+  console.log(`Initializing Compute Application in '${computeJsDir}'...`);
   console.log(`Application name: ${appName}`);
   fs.mkdirSync(computeJsDir);
   fs.mkdirSync(path.resolve(computeJsDir, './src'));
@@ -206,7 +206,7 @@ export default function init(argv: string[]) {
 
   console.log(`\
 
-To build your Next.js application for Compute@Edge and run it in the
+To build your Next.js application for Fastly Compute and run it in the
 local development environment, run:
 
   npx @fastly/next-compute-js build
@@ -217,7 +217,7 @@ Or, run the following to do this in one go:
 
   npm run fastly-serve
 
-To deploy the application to your Compute@Edge service, run:
+To deploy the application to your Compute service, run:
 
   npm run fastly-deploy
 
@@ -230,9 +230,9 @@ Good luck!
 
 function displayHelp() {
   console.log(`\
-next-compute-js: Run your Next.js application on Compute@Edge JavaScript.
+next-compute-js: Run your Next.js application on Fastly Compute.
 
-Initializes a Compute@Edge application.
+Initializes a Compute application.
 
 Usage:
   npx @fasty/next-compute-js init [<flags>]

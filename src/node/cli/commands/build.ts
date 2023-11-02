@@ -50,7 +50,7 @@ export default function build(argv: string[]) {
 
   const computeJsDir = path.resolve(NEXT_COMPUTE_JS_DIRECTORY_NAME);
   if (!fs.existsSync(computeJsDir)) {
-    throw new Error(`❌ @fastly/next-compute-js Compute@Edge project directory '${computeJsDir}' must exist. Try running 'init' command first.`);
+    throw new Error(`❌ @fastly/next-compute-js Compute project directory '${computeJsDir}' must exist. Try running 'init' command first.`);
   }
 
   // load package.json
@@ -125,7 +125,7 @@ export default function build(argv: string[]) {
 
 function displayHelp() {
   console.log(`\
-next-compute-js: Run your Next.js application on Compute@Edge JavaScript.
+next-compute-js: Run your Next.js application on Fastly Compute.
 
 Builds and transforms the Next.js application for running under next-compute-js.
 
