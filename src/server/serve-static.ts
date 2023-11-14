@@ -11,7 +11,7 @@ import { ComputeJsNextRequest, ComputeJsNextResponse } from "./base-http/compute
 
 /**
  * Serves the contents of a file at a path.
- * (A reimplementation for Compute@Edge of function in Next.js of the same name,
+ * (A reimplementation for Compute of function in Next.js of the same name,
  * found at next/server/serve-static.ts)
  */
 export async function serveStatic(

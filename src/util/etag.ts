@@ -10,7 +10,7 @@ import crypto from 'crypto';
 
 /**
  * Generates an etag string based on a payload.
- * (An adaptation for Compute@Edge of function in Next.js of the same name,
+ * (An adaptation for Compute of function in Next.js of the same name,
  * found at next/server/api-utils/web.ts)
  */
 export default function generateETag(payload: string) {

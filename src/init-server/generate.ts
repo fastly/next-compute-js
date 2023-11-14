@@ -74,7 +74,7 @@ export function generateServerProject() {
   }
 
   const computeJsDir = path.resolve(COMPUTE_JS_DIR);
-  console.log("Initializing Compute@Edge Application in " + computeJsDir + "...");
+  console.log("Initializing Compute Application in " + computeJsDir + "...");
   console.log("Application name: " + name);
   fs.mkdirSync(computeJsDir);
   fs.mkdirSync(path.resolve(computeJsDir, './src'));
@@ -106,7 +106,7 @@ export function generateServerProject() {
     copyResourceFile(fromFile, 'compute-js', computeJsDir, copyOpts);
   }
 
-  console.log("🚀 Compute@Edge application created!");
+  console.log("🚀 Compute application created!");
 
   console.log('Installing dependencies...');
   console.log(`npm --prefix ${COMPUTE_JS_DIR} install`);
@@ -114,12 +114,12 @@ export function generateServerProject() {
   console.log('');
 
   console.log('');
-  console.log('To run your Compute@Edge application locally:');
+  console.log('To run your Compute application locally:');
   console.log('');
   console.log('  cd ' + COMPUTE_JS_DIR);
   console.log('  fastly compute serve');
   console.log('');
-  console.log('To build and deploy to your Compute@Edge service:');
+  console.log('To build and deploy to your Compute service:');
   console.log('');
   console.log('  cd ' + COMPUTE_JS_DIR);
   console.log('  fastly compute publish');
