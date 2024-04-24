@@ -322,8 +322,8 @@ The following Next.js features are supported:
 * Custom Document
 * Custom Error Page
 * Preview Mode
-* API Routes / Middleware
-* Edge API Routes / Middleware
+* API Routes
+* Edge API Routes / Edge Middleware
 * Incremental Static Regeneration
 
 The following are not supported at the current time:
@@ -332,13 +332,13 @@ The following are not supported at the current time:
 * Dynamic Import
 * Image Optimization (Image tags are supported, but the images are not optimized)
 
-### API Routes / Middleware
+### API Routes
 
-We support [API Routes and Middleware](https://nextjs.org/docs/api-routes/introduction). The handlers in your application
+We support [API Routes](https://nextjs.org/docs/api-routes/introduction). The handlers in your application
 will receive Node.js-style request and response objects that have Next.js [Request](https://nextjs.org/docs/api-routes/request-helpers)
 and [Response](https://nextjs.org/docs/api-routes/response-helpers) helpers applied to them.
 
-### Edge SSR Rendering / Edge API Routes / Middleware
+### Edge SSR Rendering / Edge API Routes / Edge Middleware
 
 We support [Edge SSR rendering](https://nextjs.org/docs/app/building-your-application/rendering/edge-and-nodejs-runtimes#edge-runtime).
 
