@@ -221,7 +221,7 @@ To deploy the application to your Compute service, run:
 
   npm run fastly-deploy
 
-For details, check out the README at https://unpkg.com/@fastly/next-compute-js@alpha/README.md.
+For details, check out the README at https://unpkg.com/@fastly/next-compute-js/README.md.
 
 Good luck!
 `);
