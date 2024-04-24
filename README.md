@@ -4,8 +4,6 @@ Deploy and serve your [Next.js](https://nextjs.org) website from Fastly's [Compu
 
 > NOTE: `@fastly/next-compute-js` is provided as a Fastly Labs product. Visit the [Fastly Labs](https://www.fastlylabs.com/) site for terms of use.
 
-> NOTE: This is a prerelease version of this tool. For the current version, [click here](https://github.com/fastly/next-compute-js/tree/main).
-
 ## New! Version 2
 
 With Version 2, `@fastly/next-compute-js` has been rebuilt from the ground up, with the following features:
@@ -19,6 +17,8 @@ With Version 2, `@fastly/next-compute-js` has been rebuilt from the ground up, w
   * Adds support for Edge SSR / Edge API Routes by specifying the `edge` runtime.
   * Adds support for Edge Middleware.
   * Adds support for Incremental Static Regeneration, with support for On-demand Revalidation and Draft Mode (as well as Preview Mode).
+
+> If you need to use the 0.9.x version of this tool, [click here](https://github.com/fastly/next-compute-js/tree/v0.9.x).
 
 ### Upgrading
 
@@ -104,14 +104,6 @@ npm run dev
 ```
 
 ### <a name='create-compute-js'></a> Create your Compute project
-
-> HINT: Since this is a prerelease version, you'll need to add @fastly/next-compute-js to your project.
-> 
-> Add `@fastly/next-compute-js` to your project:
-> 
-> ```shell
-> npm install @fastly/next-compute-js@alpha
-> ```
 
 In your project directory, type the following command to scaffold a Compute project:
 
